@@ -1,0 +1,172 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* Couleurs de base liées aux variables */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary-color);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Couleurs fixes */
+  --color-secondary: #FBBF24;
+  --color-action: #DC2626;
+  --color-formation: #FFD700;
+  --color-formation-foreground: #003366;
+
+  /* Utilitaires */
+  --color-muted: var(--muted);
+  --color-cyan-600: #0891b2;
+  --color-teal-600: #0d9488;
+  --color-emerald-600: #059669;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-sm: calc(var(--radius) * 0.6);
+}
+
+:root {
+  /* --- MODE CLAIR (PROPRE) --- */
+  --background: #ffffff;
+  --foreground: #0f172a;
+  /* Slate 900 pour un texte très lisible */
+  --primary-color: #1D4ED8;
+  /* Bleu Royal */
+  --card: #f8fafc;
+  /* Slate 50 : un gris très léger pour détacher les cartes du fond */
+  --card-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --border: #e2e8f0;
+  /* Gris clair pour les bordures */
+  --input: #f1f5f9;
+  --ring: #3b82f6;
+  --radius: 0.625rem;
+}
+
+.dark {
+  /* --- MODE SOMBRE (TES COULEURS ASSTSF) --- */
+  --background: #001A3D;
+  /* Ton bleu nuit habituel */
+  --foreground: #f8fafc;
+  --primary-color: #3B82F6;
+  /* Bleu plus clair pour le contraste */
+  --card: #002554;
+  /* Bleu intermédiaire pour les cartes */
+  --card-foreground: #f8fafc;
+  --muted: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #3B82F6;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl font-light uppercase tracking-[0.2em] leading-tight text-foreground;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl font-black uppercase tracking-tight text-foreground;
+  }
+
+  h3 {
+    @apply text-lg font-bold text-foreground;
+  }
+
+  /* Si tu veux que tes titres soient bleus par défaut dans les deux modes */
+  h1,
+  h2,
+  h3 {
+    @apply text-primary font-bold;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ==========================================================================
+   🎯 GESTION CLAIR/SOMBRE DES INPUTS NATIFS
+   ========================================================================== */
+
+/* Mode clair par défaut : les icônes seront noires/grises */
+input[type="date"],
+input[type="time"] {
+  color-scheme: light;
+}
+
+/* Mode sombre de Tailwind : les icônes deviennent blanches */
+.dark input[type="date"],
+.dark input[type="time"] {
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   🖨️ GESTION DE L'IMPRESSION ET GÉNÉRATION DES PDF
+   ========================================================================== */
+
+@media screen {
+
+  /* Sur un écran normal, on cache les feuilles PDF pour ne pas polluer la page */
+  .only-print {
+    display: none !important;
+  }
+}
+
+@media print {
+
+  /* En impression, on cache l'interface du site (Navbar, Header, Boutons...) */
+  .no-print,
+  header,
+  nav,
+  aside,
+  footer {
+    display: none !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html,
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* On force la feuille PDF à prendre tout l'écran, par-dessus le reste */
+  .only-print {
+    display: flex !important;
+    flex-direction: column !important;
+    background: white !important;
+    width: 100vw !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    box-sizing: border-box !important;
+    z-index: 999999 !important;
+  }
+
+  .only-print * {
+    color: black !important;
+    border-color: #000 !important;
+  }
+}

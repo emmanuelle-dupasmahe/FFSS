@@ -1,0 +1,280 @@
+// Prisma schema for ASSTSF V2
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// --- UTILISATEURS ---
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String    
+  name          String?   
+  phone         String?   
+  image         String?   
+  userType      String?   @default("PARTICULIER") 
+  isStudent     Boolean   @default(false) 
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // 🆕 Champs ajoutés pour la licence FFSS
+  birthDate     DateTime?
+  birthPlace    String?
+  address       String?
+  zipCode       String?
+  city          String?
+
+
+  // Relations
+  userRoles     UserRole[]
+  devisDPS      DevisDPS[]    // Ajouté : Les demandes de DPS de l'utilisateur
+  inscriptions  Inscription[] // Ajouté : Les inscriptions aux formations
+}
+
+model Role {
+  id            String    @id @default(cuid())
+  name          String    @unique 
+  description   String?   
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  userRoles     UserRole[]
+}
+
+model UserRole {
+  userId      String
+  roleId      String
+  assignedAt  DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+
+// --- IMAGES cARROUSSELS---
+
+
+model SiteImage {
+  id        String   @id @default(cuid())
+  category  String   // ex: "CAROUSEL_DPS", "CAROUSEL_FORMATIONS"
+  src       String   // L'URL de l'image
+  label     String?  // La légende
+  order     Int      @default(0) // Pour choisir l'ordre d'affichage
+  createdAt DateTime @default(now())
+}
+
+// --- CMS & GESTION DES FORMATIONS ---
+
+model Formation {
+  id          String   @id @default(cuid())
+  slug        String   @unique 
+  title       String   
+  subtitle    String   
+  description String   @db.Text
+  price       Float?   
+  duration    String?  
+  ageMin      Int?     @default(17)
+  color       String?  @default("bg-blue-600") 
+  details     Json?    
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  descriptionDetaillee String?  @db.Text
+  epreuves            String?  @db.Text
+  sessions     Session[]
+
+  // Relation
+  inscriptions Inscription[] //  Liste des candidats inscrits
+  ressources   Ressource[]
+}
+
+model SiteContent {
+  id    String @id @default(cuid())
+  key   String @unique 
+  value String @db.Text
+}
+
+
+// --- NOUVEAUX MODÈLES : GESTION DES FLUX ---
+
+model DevisDPS {
+  id              String   @id @default(cuid())
+  status          String   @default("EN_ATTENTE") // EN_ATTENTE, TRAITE, ARCHIVE
+  
+  // Informations de contact de l'organisme
+  organismeDemandeur String?
+  nomContact         String?
+  telephoneContact   String?
+  emailContact       String?
+
+  // Détails Logistiques
+  superficie      String?
+  distanceMaxi    String?
+  fournitLocal    Boolean  @default(false)
+
+  // Stockage des réponses textuelles du formulaire
+  ambiance        String?  // Calme, Dynamique, etc.
+  accessibilite   String?  // Facile, Complexe, etc.
+  delaiSecours    String?  // Moins de 10 min, etc.
+
+  // Valeurs numériques calculées (0.25, 0.50, 0.75, 1.00)
+  p2              Float    @default(0.25)
+  e1              Float    @default(0.25)
+  e2              Float    @default(0.25)
+
+ // Signature Électronique - Bloc RIS & Convention (Envoyés ensemble)
+  isSigned            Boolean   @default(false)
+  signedAt            DateTime?
+  signatureImg        String?   @db.Text
+
+  // Signature Électronique - Devis (Envoyé plus tard)
+  devisIsSigned       Boolean   @default(false)
+  devisSignedAt       DateTime?
+  devisSignatureImg   String?   @db.Text
+  
+  // Infos Événement
+  eventTitle      String
+  eventDate       DateTime
+  endDate         DateTime?
+  startTime       String?
+  endTime         String?
+  location        String
+  expectedPublic  Int?
+  description     String   @db.Text
+  // 🆕 Montant financier
+  totalMontant    Float?
+  
+  // Relation avec l'utilisateur
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+enum ModePaiement {
+  CHEQUE
+  LIQUIDE
+  VIREMENT
+}
+
+model Session {
+  id              String        @id @default(uuid())
+  startDate       DateTime?     
+  endDate         DateTime?      // date de fin
+  details         String?
+  minParticipants Int           @default(6)
+  maxParticipants Int           @default(12)
+  inscriptions    Inscription[] // Liste des inscrits à cette date précise
+  formationId     String
+  formation       Formation     @relation(fields: [formationId], references: [id])
+  createdAt       DateTime      @default(now())
+}
+
+model Inscription {
+  id              String    @id @default(cuid())
+  status    String   @default("VALIDEE") // "VALIDEE" ou "ATTENTE" 
+  sessionId       String?       // Optionnel au début pour ne pas casser tes anciennes données
+  session         Session?      @relation(fields: [sessionId], references: [id])
+  
+  // Détails spécifiques à la demande
+  typeDemande     String    @default("INDIVIDUEL") // Pour savoir si c'est un groupe ou non
+  structureName   String?   // Si c'est une structure qui demande
+  siret           String?   // Optionnel (comme convenu)
+  expectedParticipants Int    @default(1)
+
+  // Prérequis (Validation Admin)
+  hasBNSSA        Boolean   @default(false)
+  hasPSE1         Boolean   @default(false)
+  hasPSE2         Boolean   @default(false)
+  needRecyclage   Boolean   @default(false)
+
+  // Logistique & Catalogue
+  location        String?   
+  formationId     String
+  formation       Formation @relation(fields: [formationId], references: [id])
+  
+  // L'utilisateur qui fait la demande (User.userType sera déjà STRUCTURE ou PARTICULIER)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  swimLevel             String?  // Pour stocker "CLUB", "REGULIER", "DEBUTANT"
+  message               String?  @db.Text // @db.Text permet de stocker des messages très longs
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // 🆕 Champs ajoutés pour le Devis et la Signature de la formation
+  devisUrl             String?   
+  isDevisSigned        Boolean   @default(false)
+  devisSignedAt        DateTime?
+  devisSignatureImg    String?   @db.Text
+
+  // Suivi financier manuel
+  prixTotal           Float    @default(0)     // Le prix total à payer pour cette inscription
+  paiements           Paiement[]    // Liste des versements effectués
+  
+  // Gestion du forfait BNSSA + PSE1
+  inscriptionParentId String?
+  inscriptionParent   Inscription?  @relation("ForfaitBundle", fields: [inscriptionParentId], references: [id], onDelete: Cascade)
+  formationsIncluses  Inscription[] @relation("ForfaitBundle")
+}
+
+model Paiement {
+  id            String       @id @default(cuid())
+  inscriptionId String
+  inscription   Inscription  @relation(fields: [inscriptionId], references: [id], onDelete: Cascade)
+  montant       Float        // Montant du versement (ex: 140)
+  mode          ModePaiement // CHEQUE ou LIQUIDE
+  nomPayeur     String?      // Indispensable : Nom écrit sur le chèque (ex: Parent)
+  numCheque     String?      // Optionnel : pour aider le trésorier à pointer
+  createdAt     DateTime     @default(now())
+  note          String?      // Ex: "Espèces données en main propre"
+}
+
+model CatalogueDPS {
+  id          String   @id @default(cuid())
+  name        String   // PAPS, DPS-PE, Grands Événements
+  shortName   String   // Le petit titre au-dessus
+  description String   @db.Text
+  icon        String   @default("Users") // Le nom de l'icône Lucide
+  color       String   @default("primary") // primary, red, etc.
+  order       Int      @default(0)
+  updatedAt   DateTime @updatedAt
+}
+// --- RESSOURCES PÉDAGOGIQUES (Espace Stagiaire) ---
+
+model Ressource {
+  id          String    @id @default(cuid())
+  title       String    // ex: "Livret d'accueil BNSSA" ou "Lien QCM"
+  url         String    // Le lien vers le fichier (Google Drive, ton serveur) ou site web
+  type        String    @default("PDF") // ex: "PDF", "LIEN", "VIDEO"
+  
+  formationId String
+  formation   Formation @relation(fields: [formationId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  type      String   @unique // "RIS", "CHIFFRAGE", "FACTURE", "FORMATION"
+  subject   String
+  body      String   @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+model SystemAlert {
+  id        String   @id @default("main-alert") // Un seul bandeau unique
+  content   String   @db.Text
+  type      String   @default("info") // "info", "warning", "success"
+  isActive  Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+}
