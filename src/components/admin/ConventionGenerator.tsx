@@ -31,9 +31,8 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
         dateFin: dateFin,
         heureFin: demandeDPS.endTime || "",
 
-        secouristes: calculRIS?.nombreSecouristes || 0,
-        vpsp: calculRIS?.nombreVehicules || 0,
-        autresVehicules: 0,
+        // NOUVEAU : Le texte modifiable pour la composition du dispositif
+        texteArt42: `- Nombre d'intervenants secouristes : ${calculRIS?.nombreSecouristes || 0}\n- Véhicules de premiers secours : ${calculRIS?.nombreVehicules || 0} VPSP\n- Autres véhicules : 0`,
 
         assoPresTel: "06.11.58.34.35",
         assoVpTel: "06.99.70.91.63",
@@ -72,18 +71,15 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
             element.style.left = "0";
             element.style.zIndex = "-9999";
 
-            // Force la hauteur de TOUS les textareas pour supprimer les ascenseurs
             const textareas = element.querySelectorAll("textarea");
             textareas.forEach(ta => {
                 ta.style.height = "0px";
                 ta.style.height = (ta.scrollHeight + 5) + "px";
             });
 
-            // 🪛 NOUVEAU : On cible les 3 pages distinctes créées plus bas
             const pages = element.querySelectorAll('.pdf-page');
             const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-            // On boucle sur chaque page pour la prendre en photo et l'ajouter au PDF
             for (let i = 0; i < pages.length; i++) {
                 const pageEl = pages[i] as HTMLElement;
                 const imgData = await htmlToImage.toJpeg(pageEl, {
@@ -102,7 +98,6 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
                 let printWidth = pdfWidth;
                 let printHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-                // Sécurité : Si vous tapez énormément de texte et que ça dépasse A4, on réduit l'image pour que tout rentre !
                 if (printHeight > pdfHeight) {
                     printHeight = pdfHeight;
                     printWidth = (imgProps.width * pdfHeight) / imgProps.height;
@@ -130,10 +125,6 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
     };
 
     const inlineTextareaStyle = "w-full bg-transparent resize-none focus:outline-none text-justify font-sans text-[12px] leading-relaxed p-1 rounded hover:bg-slate-50 focus:bg-blue-50/50 transition-colors border border-transparent focus:border-blue-300 text-slate-900";
-
-    // ==========================================
-    // 🪛 DÉCOUPAGE PHYSIQUE EN 3 PAGES DISTINCTES
-    // ==========================================
 
     const page1 = (
         <>
@@ -229,11 +220,12 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
             />
 
             <p className="font-bold underline text-[11px] mb-1 text-black">4.2 Composition du dispositif :</p>
-            <ul className="mb-4 list-disc ml-6 font-bold text-[12px] text-slate-900">
-                <li>Nombre d'intervenants secouristes : {infos.secouristes}</li>
-                <li>Véhicules de premiers secours : {infos.vpsp} VPSP</li>
-                <li>Autres véhicules : {infos.autresVehicules}</li>
-            </ul>
+            <textarea
+                rows={3}
+                value={infos.texteArt42}
+                onChange={e => setInfos({ ...infos, texteArt42: e.target.value })}
+                className={inlineTextareaStyle + " mb-4"}
+            />
 
             <p className="font-bold underline text-[11px] mb-1 text-black">4.3 Informations concernant le dispositif :</p>
             <p className="mb-1 italic text-black font-semibold">4.3.1 Les intervenants :</p>

@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next"; // 🪛 NOUVEAU : Import de Viewport
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TopAlertBanner from "@/components/public/TopAlertBanner";
@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// 🪛 NOUVEAU : Configuration de l'affichage sur mobile (PWA)
+//Configuration de l'affichage sur mobile (PWA)
 export const viewport: Viewport = {
   themeColor: "#ffffff",
   width: "device-width",
@@ -27,13 +27,13 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-// 🪛 MISE À JOUR : Ajout du manifest et des icônes Apple
+// Ajout du manifest et des icônes Apple
 export const metadata: Metadata = {
-  title: "ASSTSF - Secourisme et Sauvetage",
-  description: "Association des Secouristes de la Seyne Tamaris Six-Fours, affiliée à la FFSS.",
+  title: "ASSTSF - Formation Secourisme et Sauvetage | La Seyne, Six-Fours, Toulon, Var (83)",
+  description: "Passez vos diplômes de secourisme (PSE1, PSE2) et de sauvetage aquatique (BNSSA, SSA) avec l'Association des Secouristes de la Seyne Tamaris Six-Fours (FFSS).",
   manifest: "/manifest.json",
   icons: {
-    icon: "/icon-192.png", // Déclare le favicon pour les onglets de navigateur
+    icon: "/icon-192.png",
     apple: "/apple-icon.png",
   },
   appleWebApp: {
