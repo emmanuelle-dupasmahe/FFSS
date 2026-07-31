@@ -52,14 +52,27 @@ export default async function InscriptionsAdminPage({
 
     const totalInscriptions = formations.reduce((acc, f) => acc + f.inscriptions.length, 0);
 
-    // 🆕 PRÉPARATION DES DONNÉES POUR LE TABLEUR EXCEL
-
+    // 🪛 CORRECTION : PRÉPARATION SÉCURISÉE DES DONNÉES POUR LE TABLEUR EXCEL
+    // On extrait uniquement les champs texte/date nécessaires pour éviter le crash de sérialisation de Next.js
     const exportData = formations.flatMap(f =>
         f.inscriptions
             .filter(ins => ins.typeDemande !== "STRUCTURE" && ins.user)
             .map(ins => ({
-                user: ins.user,
-                formation: f // On garde l'objet formation ici
+                user: {
+                    id: ins.user?.id,
+                    name: ins.user?.name,
+                    email: ins.user?.email,
+                    phone: ins.user?.phone,
+                    birthDate: ins.user?.birthDate,
+                    birthPlace: ins.user?.birthPlace,
+                    address: ins.user?.address,
+                    zipCode: ins.user?.zipCode,
+                    city: ins.user?.city
+                },
+                formation: {
+                    id: f.id,
+                    title: f.title
+                }
             }))
     ).filter(item => item.user && item.user.birthDate && item.user.address);
 
@@ -90,7 +103,7 @@ export default async function InscriptionsAdminPage({
                         </div>
                     </div>
 
-                    {/* 🆕 LE BOUTON D'EXPORTATION EXCEL */}
+                    {/* LE BOUTON D'EXPORTATION EXCEL */}
                     <ExportFFSSButton data={uniqueFfssUsers} />
                 </div>
 
@@ -178,7 +191,7 @@ export default async function InscriptionsAdminPage({
                                                         </div>
                                                     </td>
 
-                                                    {/* COLONNE 2 : CONTACT & STATUT FFSS (Simplifié) */}
+                                                    {/* COLONNE 2 : CONTACT & STATUT FFSS */}
                                                     <td className="p-4 align-top">
                                                         <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
                                                             <div className="flex items-center gap-2 select-all">
@@ -213,7 +226,6 @@ export default async function InscriptionsAdminPage({
                                                             <p className="text-[9px] font-bold text-slate-400 uppercase">
                                                                 Places : <span className="text-foreground">{ins.expectedParticipants}</span>
                                                             </p>
-                                                            {/* 🆕 AFFICHAGE DE LA DATE CHOISIE */}
                                                             {ins.session?.startDate ? (
                                                                 <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-indigo-600 bg-indigo-500/10 px-2 py-1 rounded-lg border border-indigo-500/20 mt-1">
                                                                     <CalendarClock size={12} />
@@ -232,9 +244,9 @@ export default async function InscriptionsAdminPage({
                                                     {/* COLONNE 4 : SUIVI FINANCIER DYNAMIQUE */}
                                                     <td className="p-4 align-top border-l border-dashed border-emerald-500/30 bg-emerald-50/10 dark:bg-emerald-950/10">
                                                         {(() => {
-                                                            // Calculs automatiques
-                                                            const prixTotal = ins.prixTotal || 0;
-                                                            const totalPaye = ins.paiements.reduce((sum, p) => sum + p.montant, 0);
+                                                            // 🪛 CORRECTION : Sécurisation des calculs en forçant le type Number
+                                                            const prixTotal = Number(ins.prixTotal || 0);
+                                                            const totalPaye = ins.paiements.reduce((sum, p) => sum + Number(p.montant || 0), 0);
                                                             const resteAPayer = prixTotal - totalPaye;
                                                             const estSolde = resteAPayer <= 0 && prixTotal > 0;
 

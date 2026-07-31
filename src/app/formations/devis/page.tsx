@@ -34,7 +34,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 function DevisFormationForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    
+
     const [loading, setLoading] = useState(false);
     const [isStructure, setIsStructure] = useState(false);
     const [diplomeVise, setDiplomeVise] = useState("");
@@ -54,14 +54,14 @@ function DevisFormationForm() {
             .then((res) => res.json())
             .then((data) => {
                 setFormations(data);
-                
+
                 const preselectedFormation = searchParams.get("formation");
                 if (preselectedFormation) {
                     const titleUpper = preselectedFormation.toUpperCase();
                     if (titleUpper.includes("RECYCLAGE") || titleUpper.includes("MAC") || titleUpper.includes("MAINTIEN")) {
                         setTypeFormation("RECYCLAGE");
                     }
-                    
+
                     setDiplomeVise(preselectedFormation);
                 }
             })
@@ -70,9 +70,9 @@ function DevisFormationForm() {
 
     useEffect(() => {
         if (!searchParams.get("formation") || diplomeVise !== searchParams.get("formation")) {
-             setDiplomeVise("");
-             setSelectedSessionId("");
-             setSessions([]);
+            setDiplomeVise("");
+            setSelectedSessionId("");
+            setSessions([]);
         }
     }, [typeFormation]);
 
@@ -111,6 +111,11 @@ function DevisFormationForm() {
         setLoading(true);
 
         const formData = new FormData(event.currentTarget);
+        // On récupère la formation sélectionnée pour envoyer son ID exact
+        const match = formations.find((f: any) => f.title === diplomeVise);
+        if (match) {
+            formData.append("formationId", match.id);
+        }
         formData.append("type", isStructure ? "STRUCTURE" : "INDIVIDUEL");
         formData.append("diplomeVise", diplomeVise);
         formData.append("typeFormation", typeFormation);
@@ -118,7 +123,7 @@ function DevisFormationForm() {
         formData.append("hasPSE2", hasPSE2.toString());
         formData.append("hasBNSSA", hasBNSSA.toString());
         formData.append("needRecyclage", needRecyclage.toString());
-        
+
         // 🪛 SÉCURITÉ : N'envoyer l'ID de session que si on l'a vraiment sélectionné
         if (selectedSessionId) {
             formData.append("sessionId", selectedSessionId);

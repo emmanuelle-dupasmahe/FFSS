@@ -6,7 +6,6 @@ import {
   Shield,
   UserPlus,
   Fingerprint,
-  ExternalLink,
   Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -127,9 +126,7 @@ export default async function UsersAdminPage({
                       }`}>
                       {user.userType || "PARTICULIER"}
                     </span>
-                    <Link href={`/admin/users/${user.id}`} className="text-slate-400 hover:text-primary transition-colors">
-                      <ExternalLink size={14} />
-                    </Link>
+                    {/* Le composant <Link> avec <ExternalLink /> causant l'erreur 404 a été retiré */}
                   </div>
                 </div>
 
@@ -177,7 +174,6 @@ export default async function UsersAdminPage({
                     {new Date(user.createdAt).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })}
                   </div>
 
-                  {/* Interactivité déportée ici pour éviter les erreurs de Server Component */}
                   <UserActions
                     userId={user.id}
                     isAdmin={isAdmin}

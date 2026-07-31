@@ -15,57 +15,31 @@ export async function createInscription(formData: FormData) {
     }
 
     // 1. Extraction des données du formulaire
-    const typeDemande = formData.get("type") as string; // INDIVIDUEL ou STRUCTURE
-    const diplomeVise = formData.get("diplomeVise") as string;
-    const formationType = formData.get("formationType") as string; // INITIALE ou RECYCLAGE
-
-    // 🪛 NOUVEAU : On récupère l'ID de la session choisie
+    const typeDemande = formData.get("type") as string;
     const sessionId = formData.get("sessionId") as string;
-
-    // Infos Structure
     const structureName = formData.get("structureName") as string;
     const siret = formData.get("siret") as string;
     const participants = formData.get("participants") as string;
 
-    // Prérequis (on convertit les strings "true"/"false" en Boolean)
     const hasBNSSA = formData.get("hasBNSSA") === "true";
     const hasPSE1 = formData.get("hasPSE1") === "true";
     const hasPSE2 = formData.get("hasPSE2") === "true";
     const needRecyclage = formData.get("needRecyclage") === "true";
 
-    // Logistique et Message
     const location = formData.get("location") as string;
     const message = formData.get("message") as string;
-    //pour le niveau de nage
     const swimLevel = formData.get("swimLevel") as string;
 
     try {
-        // 2. Recherche de la formation correspondante dans le catalogue avec distinction Initiale / Recyclage
-        const formation = await prisma.formation.findFirst({
-            where: {
-                title: { contains: diplomeVise, mode: 'insensitive' },
-                isActive: true,
-                // 🪛 Ajout de la distinction stricte entre Initiale et Recyclage
-                AND: formationType === "RECYCLAGE"
-                    ? {
-                        OR: [
-                            { title: { contains: "recyclage", mode: 'insensitive' } },
-                            { title: { contains: "mac", mode: 'insensitive' } },
-                            { title: { contains: "maintien", mode: 'insensitive' } }
-                        ]
-                    }
-                    : {
-                        NOT: [
-                            { title: { contains: "recyclage", mode: 'insensitive' } },
-                            { title: { contains: "mac", mode: 'insensitive' } },
-                            { title: { contains: "maintien", mode: 'insensitive' } }
-                        ]
-                    }
-            }
+        // 2. Recherche directe par ID strict
+        const formationId = formData.get("formationId") as string;
+
+        const formation = await prisma.formation.findUnique({
+            where: { id: formationId }
         });
 
-        if (!formation) {
-            return { error: `La formation ${diplomeVise} (${formationType === "INITIALE" ? "Initiale" : "Recyclage"}) n'est pas encore disponible dans le catalogue.` };
+        if (!formation || !formation.isActive) {
+            return { error: "La formation sélectionnée n'est pas disponible (vérifiez qu'elle est bien activée/visible dans l'administration)." };
         }
 
         // 3. Création de l'inscription
@@ -76,7 +50,6 @@ export async function createInscription(formData: FormData) {
                 siret: typeDemande === "STRUCTURE" ? siret : null,
                 expectedParticipants: parseInt(participants) || 1,
 
-                // Prérequis
                 hasBNSSA,
                 hasPSE1,
                 hasPSE2,
@@ -87,10 +60,8 @@ export async function createInscription(formData: FormData) {
                 message: message,
                 status: "EN_ATTENTE",
 
-                // Relations
                 formationId: formation.id,
                 userId: session.user.id,
-                // On s'assure de renvoyer un VRAI null informatique si la date est absente ou invalide
                 sessionId: (sessionId && sessionId !== "" && sessionId !== "null" && sessionId !== "undefined") ? sessionId : null,
             },
         });

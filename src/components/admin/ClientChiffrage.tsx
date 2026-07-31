@@ -344,8 +344,8 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
                     <div className="grid grid-cols-2 gap-8 mb-8">
                         <div className="text-xs text-gray-600">
                             <p className="font-black text-black uppercase mb-1">ASSTSF</p>
-                            <p>Agréé Sécurité Civile - FFSS</p>
-                            <p>Six-Fours-les-Plages</p>
+                            <p>Affiliée FFSSS</p>
+                            <p>Agréée Sécurité Civile</p>
                         </div>
                         <div className="text-right border-r-4 border-blue-600 pr-4 bg-gray-50 p-4">
                             <p className="text-[10px] font-black uppercase text-gray-400 mb-2">Devis à l'attention de :</p>
@@ -391,7 +391,7 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
                         <div className="flex justify-between items-end">
                             <div className="text-[10px] uppercase font-bold text-slate-400">
                                 {totalRemise > 0 && <p className="text-emerald-600">Économie réalisée : {totalRemise.toFixed(2)} €</p>}
-                                <p className="mt-2 text-[8px] text-gray-400 normal-case">*Ce document est une estimation tarifaire indicative et ne vaut pas convention.</p>
+                                <p className="mt-2 text-[8px] text-gray-400 normal-case">Association loi 1901, sans but lucratif</p>
                             </div>
                             <div className="text-right">
                                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 block mb-1">Total Net Estimé</span>
@@ -415,8 +415,8 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
                 <div className="grid grid-cols-2 gap-8 mb-8 shrink-0">
                     <div className="text-xs text-gray-600">
                         <p className="font-black text-black uppercase mb-1">ASSTSF</p>
-                        <p>Agréé Sécurité Civile - FFSS</p>
-                        <p>Six-Fours-les-Plages</p>
+                        <p>AffiliéeFFSS</p>
+                        <p>Agréée Sécurité Civile</p>
                     </div>
                     <div className="text-right border-r-4 border-blue-600 pr-4 bg-gray-50 p-4">
                         <p className="text-[10px] font-black uppercase text-gray-400 mb-2">Devis à l'attention de :</p>
@@ -463,7 +463,7 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
                         <p>EXONÉRATION TVA - ART. 261-7-1 DU CGI</p>
                         <p>VALIDITÉ : 30 JOURS</p>
                         {totalRemise > 0 && <p className="mt-2 text-emerald-600 font-black">Total remises accordées : -{totalRemise.toFixed(2)} €</p>}
-                        <p className="mt-4 text-black italic normal-case">*Ce document est une estimation tarifaire indicative et ne vaut pas convention.</p>
+                        <p className="mt-3 text-black italic normal-case">Association loi 1901, sans but lucratif</p>
                     </div>
                     <div className="text-right">
                         <p className="text-xs font-black text-blue-600 uppercase mb-1">Total Net Estimé</p>
