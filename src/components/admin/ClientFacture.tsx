@@ -317,8 +317,9 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
                     <div>
                         <p className="text-[10px] font-black uppercase text-gray-400 mb-2">De :</p>
                         <p className="text-sm font-black">ASSTSF</p>
-                        <p className="text-xs">Agréé Sécurité Civile</p>
-                        <p className="text-xs font-bold mt-2">SIRET 411 371 422 00015</p>
+                        <p className="text-xs">Affiliée FFSS</p>
+                        <p className="text-xs">Agréée Sécurité Civile</p>
+                        <p className="text-xs font-bold mt-2">SIRET 401 715 107 00033</p>
                     </div>
                     <div className="text-right">
                         <p className="text-[10px] font-black uppercase text-gray-400 mb-2">À :</p>

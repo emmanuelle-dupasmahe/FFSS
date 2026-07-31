@@ -415,7 +415,7 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
                 <div className="grid grid-cols-2 gap-8 mb-8 shrink-0">
                     <div className="text-xs text-gray-600">
                         <p className="font-black text-black uppercase mb-1">ASSTSF</p>
-                        <p>AffiliéeFFSS</p>
+                        <p>Affiliée FFSS</p>
                         <p>Agréée Sécurité Civile</p>
                     </div>
                     <div className="text-right border-r-4 border-blue-600 pr-4 bg-gray-50 p-4">
@@ -459,7 +459,7 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
 
                 <div className="mt-8 border-t-4 border-black pt-6 flex justify-between items-start shrink-0">
                     <div className="text-[8px] font-bold text-gray-400 uppercase leading-relaxed text-left">
-                        <p>SIRET 411 371 422 00015</p>
+                        <p>SIRET 401 715 107 00033</p>
                         <p>EXONÉRATION TVA - ART. 261-7-1 DU CGI</p>
                         <p>VALIDITÉ : 30 JOURS</p>
                         {totalRemise > 0 && <p className="mt-2 text-emerald-600 font-black">Total remises accordées : -{totalRemise.toFixed(2)} €</p>}
