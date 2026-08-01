@@ -42,7 +42,7 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
         let nouvellesLignes = [
             {
                 id: 1,
-                description: `Forfait Dispositif Secours (${heuresPrestation}h x ${effectifPersonnel} intervenants)`,
+                description: "Forfait Dispositif Premiers Secours",
                 quantite: 1,
                 prixUnitaire: effectifPersonnel * heuresPrestation * tarifHoraire,
                 remisePct: 0
@@ -52,7 +52,7 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
         if (isHorsZone && distance > 0) {
             nouvellesLignes.push({
                 id: 2,
-                description: `Participation Frais Déplacement (${distance} km)`,
+                description: "Frais Déplacement",
                 quantite: 1,
                 prixUnitaire: Number(distance) * 0.60,
                 remisePct: 0
@@ -62,7 +62,7 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
         if (hasTente) {
             nouvellesLignes.push({
                 id: 3,
-                description: "Logistique structure (Tente de secours)",
+                description: "Tente poste de secours",
                 quantite: 1,
                 prixUnitaire: 50,
                 remisePct: 0
@@ -182,7 +182,6 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
             const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
             pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
 
-            // Télécharge le fichier sur l'ordinateur
             pdf.save(`Devis_${eventTitle ? eventTitle.replace(/\s+/g, '_') : 'ASSTSF'}.pdf`);
 
             toast.success("PDF téléchargé avec succès !", { id: "dl-pdf" });
@@ -256,7 +255,6 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
                             </Button>
                         </div>
                         <div className="space-y-3">
-                            {/*  REPARTITION CORRIGÉE POUR CORRESPONDRE EXACTEMENT AUX CASES (4 - 1 - 3 - 4) */}
                             <div className="grid grid-cols-12 gap-1 text-[8px] font-bold text-slate-400 uppercase px-1">
                                 <div className="col-span-4">Désignation</div>
                                 <div className="col-span-1 text-center">Qté</div>
