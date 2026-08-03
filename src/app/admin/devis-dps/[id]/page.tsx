@@ -35,7 +35,7 @@ export default async function DetailDevisPage({ params }: { params: { id: string
 
   let qualification = "";
   if (ris <= 0.25) qualification = "Diligence autorité de police";
-  else if (ris <= 1.125) qualification = "PAPS (Point d'alerte)";
+  else if (ris <= 1.125) qualification = "PAPS (Point d'Alerte et de Premiers Secours)";
   else if (ris <= 12) qualification = "DPS de petite envergure (PE)";
   else if (ris <= 36) qualification = "DPS de moyenne envergure (ME)";
   else qualification = "DPS de grande envergure (GE)";
@@ -46,7 +46,7 @@ export default async function DetailDevisPage({ params }: { params: { id: string
   }
 
   // Le calcul de l'effectif se base sur la qualification finale
-  let effectif = (qualification === "Diligence autorité de police" || qualification === "PAPS (Point d'alerte)")
+  let effectif = (qualification === "Diligence autorité de police" || qualification === "PAPS (Point d'Alerte et de Premiers Secours)")
     ? 2
     : Math.max(4, Math.ceil(ris / 2) * 2);
 
@@ -54,6 +54,23 @@ export default async function DetailDevisPage({ params }: { params: { id: string
   if (ris > 36) effectif = Math.max(36, Math.ceil(ris / 2) * 2);
 
   const formatDate = (date: Date) => date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  // --- NOUVEAU : Traducteurs pour afficher les textes longs sur le PDF ---
+  const getLabelP2 = (val: string | null | undefined) => {
+    if (val === "Calme") return "Assis (cérémonie, spectacle …)";
+    if (val === "Peu dynamique") return "Debout statique (foire, …)";
+    if (val === "Dynamique") return "Debout dynamique (fête foraine, …)";
+    if (val === "Très dynamique") return "Debout très Dynamique : Dance, féria, …";
+    return val || "Non renseigné";
+  };
+
+  const getLabelE1 = (val: string | null | undefined) => {
+    if (val === "Facile") return "Structure permanente, voie publique";
+    if (val === "Intermédiaire") return "Structure non permanente, espaces naturel -2ha avec peu de pente";
+    if (val === "Difficile") return "Espace naturel -5ha avec de la pente";
+    if (val === "Complexe") return "Espace naturel accidenté + de 5ha, progression des secours rendue difficile par le public";
+    return val || "Non renseigné";
+  };
 
   return (
     <div className="print:p-0 print:min-h-0 min-h-screen bg-slate-50 dark:bg-[#001A3D] p-4 md:p-8 transition-colors duration-300 relative">
@@ -365,7 +382,7 @@ export default async function DetailDevisPage({ params }: { params: { id: string
         </div>
       )}
 
-      {/* 👇 FEUILLE PDF OFFICIELLE DU RIS (Celle qui existait déjà) */}
+      {/* 👇 FEUILLE PDF OFFICIELLE DU RIS */}
       <div id="zone-pdf-officiel" className="only-print flex flex-col p-[10mm] box-border bg-white text-black font-sans">
         {/* Entête */}
         <div className="flex justify-between items-start border-b-2 border-black pb-2 mb-4 shrink-0">
@@ -405,14 +422,35 @@ export default async function DetailDevisPage({ params }: { params: { id: string
             <tr className="bg-gray-100 font-black uppercase">
               <th className="border border-black p-1.5 text-left">Indicateur de risque</th>
               <th className="border border-black p-1.5 text-center">Valeur</th>
-              <th className="border border-black p-1.5 text-left">Critères</th>
+              <th className="border border-black p-1.5 text-left">Caractéristiques</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td className="border border-black p-1.5 font-bold">P2 - Ambiance Générale</td><td className="border border-black p-1.5 text-center font-black">{p2.toFixed(2)}</td><td className="border border-black p-1.5 italic text-[10px]">Comportement public</td></tr>
-            <tr><td className="border border-black p-1.5 font-bold">E1 - Accessibilité site</td><td className="border border-black p-1.5 text-center font-black">{e1.toFixed(2)}</td><td className="border border-black p-1.5 italic text-[10px]">Délais intervention</td></tr>
-            <tr><td className="border border-black p-1.5 font-bold">E2 - Délai secours</td><td className="border border-black p-1.5 text-center font-black">{e2.toFixed(2)}</td><td className="border border-black p-1.5 italic text-[10px]">Accès terrain</td></tr>
-            <tr className="bg-blue-50"><td className="border border-black p-1.5 font-black text-right" colSpan={2}>TOTAL (i) :</td><td className="border border-black p-1.5 font-black text-lg">{i.toFixed(2)}</td></tr>
+            <tr>
+              <td className="border border-black p-1.5 font-bold">P2 - Type d'activité</td>
+              <td className="border border-black p-1.5 text-center font-black">{p2.toFixed(2)}</td>
+              <td className="border border-black p-1.5 font-semibold text-slate-800 text-[10px]">
+                {getLabelP2(devis.ambiance)}
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-black p-1.5 font-bold">E1 - Environnement</td>
+              <td className="border border-black p-1.5 text-center font-black">{e1.toFixed(2)}</td>
+              <td className="border border-black p-1.5 font-semibold text-slate-800 text-[10px]">
+                {getLabelE1(devis.accessibilite)}
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-black p-1.5 font-bold">E2 - Secours publics</td>
+              <td className="border border-black p-1.5 text-center font-black">{e2.toFixed(2)}</td>
+              <td className="border border-black p-1.5 font-semibold text-slate-800 text-[10px]">
+                {devis.delaiSecours || "Non renseigné"}
+              </td>
+            </tr>
+            <tr className="bg-blue-50">
+              <td className="border border-black p-1.5 font-black text-right" colSpan={2}>TOTAL (i) :</td>
+              <td className="border border-black p-1.5 font-black text-lg">{i.toFixed(2)}</td>
+            </tr>
           </tbody>
         </table>
 

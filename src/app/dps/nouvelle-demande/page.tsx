@@ -257,10 +257,13 @@ export default function NouvelleDemandeDPS() {
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Public attendu</label>
                 <Input name="public" required type="number" placeholder="Nbre max. simultané" className="rounded-xl border-slate-200" />
 
-                {/* 🆕 NOUVELLE NOTE D'INFORMATION SUR LE PUBLIC */}
+                {/* 🆕 NOTE D'INFORMATION */}
                 <p className="text-[9px] text-slate-500 leading-relaxed italic pl-1 bg-slate-50 dark:bg-white/5 p-2 rounded-lg border border-slate-100 dark:border-white/5">
-                  <span className="font-bold text-slate-700 dark:text-slate-300">Public :</span> Ensemble de personnes qui assistent effectivement et <span className="font-bold text-primary underline">simultanément</span> à un spectacle, une manifestation, un rendez-vous sportif, une réunion... (assistance, auditoire, spectateurs). <br />
-                  <span className="text-amber-600 dark:text-amber-500">Ne comptez pas les "acteurs" de l'événement dans ce chiffre (sportifs, artistes, organisateurs, bénévoles, staff, etc.)</span>
+                  {/* 🆕 NOTE D'INFORMATION */}
+                  <p className="text-[9px] text-slate-500 leading-relaxed italic pl-1 bg-slate-50 dark:bg-white/5 p-2 rounded-lg border border-slate-100 dark:border-white/5">
+                    <span className="font-bold text-slate-700 dark:text-slate-300">Public :</span> Nombre de personnes qui <span className="text-red-600 font-semibold not-italic">assistent</span> à un spectacle, une manifestation, un rendez-vous sportif, une réunion, ... <br />
+                    <span className="font-bold text-slate-700 dark:text-slate-300">Acteurs :</span> Nombre de personnes qui <span className="text-red-600 font-semibold not-italic">participent et concourent</span> à la manifestation : sportifs, artistes, organisateurs, bénévoles, ... <br />
+                  </p>
                 </p>
               </div>
             </div>
@@ -282,7 +285,7 @@ export default function NouvelleDemandeDPS() {
               <Checkbox id="fournitLocal" name="fournitLocal" className="mt-1" />
               <div className="space-y-1 leading-none">
                 <label htmlFor="fournitLocal" className="text-sm font-bold text-slate-900 dark:text-white cursor-pointer">
-                  L'organisateur met à disposition un abri (Local, Tente, Caravane...)
+                  L'organisateur met à disposition un abri (Local, Tente...)
                 </label>
                 <p className="text-[10px] text-slate-500 leading-relaxed mt-1">
                   Cochez cette case si vous disposez d'un espace fermé pour installer le poste de secours. <br />
@@ -300,7 +303,7 @@ export default function NouvelleDemandeDPS() {
             <AlertCircle className="text-primary" size={22} />
             <div className="flex flex-col">
               <h2 className="font-black uppercase text-sm tracking-widest">Évaluation des Risques</h2>
-              <p className="text-[10px] text-slate-500 italic">Ces informations sont essentielles pour le calcul de votre dispositif (RNIS 2026)</p>
+              <p className="text-[10px] text-slate-500 italic">Ces informations sont essentielles pour le calcul de votre dispositif</p>
             </div>
           </div>
 
@@ -309,17 +312,17 @@ export default function NouvelleDemandeDPS() {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-primary">
                 <Activity size={16} />
-                <label className="text-[10px] font-black uppercase tracking-widest">Niveau d'activité (P2)</label>
+                <label className="text-[10px] font-black uppercase tracking-widest">Type d'activité (P2)</label>
               </div>
               <Select onValueChange={setAmbiance} required>
                 <SelectTrigger className="rounded-xl border-slate-200 bg-white dark:bg-slate-900">
-                  <SelectValue placeholder="Ambiance du public" />
+                  <SelectValue placeholder="Comportement du public" />
                 </SelectTrigger>
                 <SelectContent className={selectContentStyle}>
-                  <SelectItem value="Calme">Calme (Assis, expo...)</SelectItem>
-                  <SelectItem value="Peu dynamique">Peu dynamique (Foire...)</SelectItem>
-                  <SelectItem value="Dynamique">Dynamique (Sport, défilé...)</SelectItem>
-                  <SelectItem value="Très dynamique">Très dynamique (Concert...)</SelectItem>
+                  <SelectItem value="Calme">Assis (cérémonie, spectacle, ...)</SelectItem>
+                  <SelectItem value="Peu dynamique">Debout statique (foire, ...)</SelectItem>
+                  <SelectItem value="Dynamique">Debout dynamique (fête foraine, ...)</SelectItem>
+                  <SelectItem value="Très dynamique">Debout très Dynamique: (dance, féria, ...)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -328,17 +331,17 @@ export default function NouvelleDemandeDPS() {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-primary">
                 <Scaling size={16} />
-                <label className="text-[10px] font-black uppercase tracking-widest">Lieu & Terrain (E1)</label>
+                <label className="text-[10px] font-black uppercase tracking-widest">Environnement (E1)</label>
               </div>
               <Select onValueChange={setAccessibilite} required>
                 <SelectTrigger className="rounded-xl border-slate-200 bg-white dark:bg-slate-900">
-                  <SelectValue placeholder="Configuration du terrain" />
+                  <SelectValue placeholder="Caractéristiques" />
                 </SelectTrigger>
                 <SelectContent className={selectContentStyle}>
-                  <SelectItem value="Facile">Facile (-2ha, terrain plat)</SelectItem>
-                  <SelectItem value="Intermédiaire">Intermédiaire (Pentes, escaliers)</SelectItem>
-                  <SelectItem value="Difficile">+5ha ou terrain accidenté</SelectItem>
-                  <SelectItem value="Complexe">Complexe (Structures, forêt...)</SelectItem>
+                  <SelectItem value="Facile">Structure permanente, voie publique</SelectItem>
+                  <SelectItem value="Intermédiaire">Structure non permanente, espaces naturel -2 ha avec peu de pente</SelectItem>
+                  <SelectItem value="Difficile">Espace naturel -5ha avec de la pente</SelectItem>
+                  <SelectItem value="Complexe">Espace naturel accidenté + de 5ha, progression des secours rendue difficile par le public</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -347,11 +350,11 @@ export default function NouvelleDemandeDPS() {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-primary">
                 <Stethoscope size={16} />
-                <label className="text-[10px] font-black uppercase tracking-widest">Délai des secours (E2)</label>
+                <label className="text-[10px] font-black uppercase tracking-widest">Secours publics (E2)</label>
               </div>
               <Select onValueChange={setDelaiSecours} required>
                 <SelectTrigger className="rounded-xl border-slate-200 bg-white dark:bg-slate-900">
-                  <SelectValue placeholder="Délai d'arrivée Secours" />
+                  <SelectValue placeholder="Délai d'intervention" />
                 </SelectTrigger>
                 <SelectContent className={selectContentStyle}>
                   <SelectItem value="Moins de 10 minutes">Moins de 10 minutes</SelectItem>
@@ -390,7 +393,7 @@ export default function NouvelleDemandeDPS() {
                 <span className="text-[10px] font-black uppercase tracking-widest">Note</span>
               </div>
               <p className="text-[11px] text-slate-500 leading-relaxed italic">
-                Ces informations nous permettent de générer une fiche de dimensionnement conforme au référentiel national.
+                Ces informations nous permettent de générer une grille d'évaluation des risques et de dimensionner le Dispositif de Premiers Secours à personnes le plus adapté.
               </p>
             </div>
           </div>

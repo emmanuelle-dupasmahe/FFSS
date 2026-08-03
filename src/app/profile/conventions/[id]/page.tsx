@@ -7,6 +7,23 @@ import { Button } from "@/components/ui/button";
 import SignatureClient from "./SignatureClient";
 import DownloadPdfButton from "./DownloadPdfButton";
 
+// --- NOUVEAU : Traducteurs pour afficher les textes longs sur le RIS ---
+const getLabelP2 = (val: string | null | undefined) => {
+    if (val === "Calme") return "Assis (cérémonie, spectacle …)";
+    if (val === "Peu dynamique") return "Debout statique (foire, …)";
+    if (val === "Dynamique") return "Debout dynamique (fête foraine, …)";
+    if (val === "Très dynamique") return "Debout très Dynamique : Dance, féria, …";
+    return val || "Non renseigné";
+};
+
+const getLabelE1 = (val: string | null | undefined) => {
+    if (val === "Facile") return "Structure permanente, voie publique";
+    if (val === "Intermédiaire") return "Structure non permanente, espaces naturel -2ha avec peu de pente";
+    if (val === "Difficile") return "Espace naturel -5ha avec de la pente";
+    if (val === "Complexe") return "Espace naturel accidenté + de 5ha, progression des secours rendue difficile par le public";
+    return val || "Non renseigné";
+};
+
 // Ce composant serveur récupère les données de manière sécurisée
 export default async function ConventionSignaturePage({ params }: { params: { id: string } }) {
     const session = await auth();
@@ -38,7 +55,7 @@ export default async function ConventionSignaturePage({ params }: { params: { id
 
     let qualification = "";
     if (ris <= 0.25) qualification = "Diligence autorité de police";
-    else if (ris <= 1.125) qualification = "PAPS (Point d'alerte)";
+    else if (ris <= 1.125) qualification = "PAPS (Point d'alerte et de Premiers Secours)";
     else if (ris <= 12) qualification = "DPS de petite envergure (PE)";
     else if (ris <= 36) qualification = "DPS de moyenne envergure (ME)";
     else qualification = "DPS de grande envergure (GE)";
@@ -78,8 +95,19 @@ export default async function ConventionSignaturePage({ params }: { params: { id
 
             <div className="text-center mb-6">
                 <h1 className="text-xl font-black uppercase border-y border-black py-1.5 inline-block px-8 tracking-wider text-black">
-                    RAPPORT INITIAL DE SÉCURITÉ
+                    GRILLE D'ÉVALUATION DES RISQUES
                 </h1>
+
+                {/* --- Nom de l'événement et date --- */}
+                <div className="mt-4 mb-2">
+                    <h2 className="text-lg font-black uppercase text-blue-900">{devis.eventTitle}</h2>
+                    <p className="text-xs font-bold text-slate-600 mt-1">
+                        Date(s) : {devis.eventDate ? new Date(devis.eventDate).toLocaleDateString('fr-FR') : ""}
+                        {devis.endDate ? ` au ${new Date(devis.endDate).toLocaleDateString('fr-FR')}` : ""}
+                    </p>
+                </div>
+                {/* ------------------------------------------- */}
+
                 <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">Évaluation des Risques & Dimensionnement du Dispositif</p>
             </div>
 
@@ -87,12 +115,15 @@ export default async function ConventionSignaturePage({ params }: { params: { id
             <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-left">
                     <p className="text-[9px] font-black uppercase text-slate-400 mb-2 tracking-wider">Indices de Risque Renseignés</p>
+
+                    {/* --- Intitulés alignés sur le formulaire --- */}
                     <ul className="space-y-1 text-[11px]">
-                        <li>• Effectif du public attendu : <strong>{devis.expectedPublic || "Non renseigné"} personnes</strong></li>
-                        <li>• Type d'ambiance de l'événement : <strong>{devis.ambiance || "Standard"}</strong></li>
-                        <li>• Accessibilité du site : <strong>{devis.accessibilite || "Standard"}</strong></li>
-                        <li>• Délai d'intervention des secours : <strong>{devis.delaiSecours || "Normal"}</strong></li>
+                        <li>• Public attendu : <strong>{devis.expectedPublic || "Non renseigné"} personnes</strong></li>
+                        <li>• Type d'activité (P2) : <strong>{getLabelP2(devis.ambiance)}</strong></li>
+                        <li>• Environnement (E1) : <strong>{getLabelE1(devis.accessibilite)}</strong></li>
+                        <li>• Secours publics (E2) : <strong>{devis.delaiSecours || "Non renseigné"}</strong></li>
                     </ul>
+                    {/* ----------------------------------------------------- */}
                 </div>
 
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-left">
@@ -121,9 +152,12 @@ export default async function ConventionSignaturePage({ params }: { params: { id
 
                 <div className="flex items-center gap-8 mb-3">
                     <div className="flex flex-col">
-                        <span className="text-[10px] text-blue-600/80 font-bold uppercase">Score RIS global</span>
+                        <span className="text-[10px] text-blue-600/80 font-bold uppercase">Score RIS *</span>
                         <span className="text-xl font-black text-blue-900">
                             {ris.toFixed(3)}
+                        </span>
+                        <span className="text-[8px] text-blue-800/70 italic mt-0.5">
+                            * Ratio Intervenants Secouristes
                         </span>
                     </div>
                     <div className="w-px h-8 bg-blue-200"></div>
