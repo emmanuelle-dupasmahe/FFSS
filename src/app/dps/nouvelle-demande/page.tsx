@@ -322,7 +322,7 @@ export default function NouvelleDemandeDPS() {
                   <SelectItem value="Calme">Assis (cérémonie, spectacle, ...)</SelectItem>
                   <SelectItem value="Peu dynamique">Debout statique (foire, ...)</SelectItem>
                   <SelectItem value="Dynamique">Debout dynamique (fête foraine, ...)</SelectItem>
-                  <SelectItem value="Très dynamique">Debout très Dynamique: (dance, féria, ...)</SelectItem>
+                  <SelectItem value="Très dynamique">Debout très dynamique (dance, féria, ...)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

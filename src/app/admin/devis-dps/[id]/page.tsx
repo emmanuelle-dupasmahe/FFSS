@@ -60,7 +60,7 @@ export default async function DetailDevisPage({ params }: { params: { id: string
     if (val === "Calme") return "Assis (cérémonie, spectacle …)";
     if (val === "Peu dynamique") return "Debout statique (foire, …)";
     if (val === "Dynamique") return "Debout dynamique (fête foraine, …)";
-    if (val === "Très dynamique") return "Debout très Dynamique : Dance, féria, …";
+    if (val === "Très dynamique") return "Debout très dynamique  (dance, féria, …)";
     return val || "Non renseigné";
   };
 
