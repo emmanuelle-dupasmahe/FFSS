@@ -19,7 +19,7 @@ interface FormationProps {
   age: string;
   description: string;
   color: string;
-  price?: number | null; // 🪛 NOUVEAU : Réception de la donnée prix
+  price?: number | null; 
   descriptionDetaillee?: string;
   epreuves?: string;
   sessions?: any[];
@@ -33,7 +33,7 @@ export default function FormationCard({
   age,
   description,
   color,
-  price, // 🪛 NOUVEAU
+  price,
   descriptionDetaillee,
   epreuves,
   sessions = []

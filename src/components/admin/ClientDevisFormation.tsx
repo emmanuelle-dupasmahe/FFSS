@@ -36,7 +36,7 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
         if (titre.includes("RECYCLAGE")) {
             basePrice = 170;
         } else if (!inscription.hasPSE1) {
-            basePrice = 570;
+            basePrice = 500;
             descriptionBase += " (Inclut PSE1 + Réglementation)";
         } else {
             basePrice = 350;
@@ -46,11 +46,13 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
             baseRemise = 10;
         }
     } else if (titre.includes("PSE1")) {
-        basePrice = titre.includes("RECYCLAGE") ? 100 : 280;
+        basePrice = titre.includes("RECYCLAGE") ? 100 : 250;
     } else if (titre.includes("PSE2")) {
-        basePrice = titre.includes("RECYCLAGE") ? 70 : 200;
+        basePrice = titre.includes("RECYCLAGE") ? 100 : 250;
     } else if (titre.includes("PSC")) {
-        basePrice = 60;
+        basePrice = 70;
+    } else if (titre.includes("GQS")) {
+        basePrice = 20;
     } else if (titre.includes("SSA")) {
         basePrice = titre.includes("RECYCLAGE") ? 120 : 220;
     }

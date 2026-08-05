@@ -49,6 +49,7 @@ function DevisFormationForm() {
     const [hasBNSSA, setHasBNSSA] = useState(false);
     const [needRecyclage, setNeedRecyclage] = useState(false);
 
+    // 🪛 CORRECTION 1 : Logique de chargement et pré-sélection fiabilisée
     useEffect(() => {
         fetch('/api/formations-list')
             .then((res) => res.json())
@@ -57,25 +58,41 @@ function DevisFormationForm() {
 
                 const preselectedFormation = searchParams.get("formation");
                 if (preselectedFormation) {
-                    const titleUpper = preselectedFormation.toUpperCase();
-                    if (titleUpper.includes("RECYCLAGE") || titleUpper.includes("MAC") || titleUpper.includes("MAINTIEN")) {
-                        setTypeFormation("RECYCLAGE");
-                    }
+                    const match = data.find((f: any) => f.title === preselectedFormation);
+                    if (match) {
+                        const titleUpper = match.title.toUpperCase();
+                        if (titleUpper.includes("RECYCLAGE") || titleUpper.includes("MAC") || titleUpper.includes("MAINTIEN")) {
+                            setTypeFormation("RECYCLAGE");
+                        } else {
+                            setTypeFormation("INITIALE");
+                        }
 
-                    setDiplomeVise(preselectedFormation);
+                        // Petit délai pour laisser le temps au Select de générer ses options
+                        setTimeout(() => {
+                            setDiplomeVise(match.title);
+                        }, 50);
+                    }
                 }
             })
             .catch(() => toast.error("Impossible de charger le catalogue des formations"));
     }, [searchParams]);
 
+    // 🪛 CORRECTION 2 : On ne vide le champ QUE si l'utilisateur change manuellement le bouton Initiale/Recyclage
     useEffect(() => {
-        if (!searchParams.get("formation") || diplomeVise !== searchParams.get("formation")) {
+        if (!diplomeVise) return;
+
+        const titleUpper = diplomeVise.toUpperCase();
+        const isRecyclage = titleUpper.includes("RECYCLAGE") || titleUpper.includes("MAC") || titleUpper.includes("MAINTIEN");
+        const isStillValid = typeFormation === "RECYCLAGE" ? isRecyclage : !isRecyclage;
+
+        if (!isStillValid) {
             setDiplomeVise("");
             setSelectedSessionId("");
             setSessions([]);
         }
     }, [typeFormation]);
 
+    // Chargement des sessions quand le diplôme est choisi
     useEffect(() => {
         if (!diplomeVise || formations.length === 0) return;
 
@@ -92,7 +109,6 @@ function DevisFormationForm() {
         }
     }, [diplomeVise, formations]);
 
-    // 🪛 CORRECTION : On déplace ce filtre AVANT la fonction d'envoi pour que le bouton puisse l'utiliser !
     const upcomingSessions = sessions.filter((s: any) => {
         const sessionDate = new Date(s.startDate);
         const today = new Date();
@@ -103,7 +119,6 @@ function DevisFormationForm() {
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        // 🪛 CORRECTION : On vérifie `upcomingSessions` (les dates affichées) et plus `sessions` (toutes les dates)
         if (!isStructure && upcomingSessions.length > 0 && !selectedSessionId) {
             return toast.error("Veuillez sélectionner une session (date de formation).");
         }
@@ -111,7 +126,6 @@ function DevisFormationForm() {
         setLoading(true);
 
         const formData = new FormData(event.currentTarget);
-        // On récupère la formation sélectionnée pour envoyer son ID exact
         const match = formations.find((f: any) => f.title === diplomeVise);
         if (match) {
             formData.append("formationId", match.id);
@@ -124,7 +138,6 @@ function DevisFormationForm() {
         formData.append("hasBNSSA", hasBNSSA.toString());
         formData.append("needRecyclage", needRecyclage.toString());
 
-        // 🪛 SÉCURITÉ : N'envoyer l'ID de session que si on l'a vraiment sélectionné
         if (selectedSessionId) {
             formData.append("sessionId", selectedSessionId);
         }
@@ -135,7 +148,6 @@ function DevisFormationForm() {
             toast.error(result.error);
         } else {
             toast.success("Demande de devis transmise avec succès !");
-            // 🪛 CORRECTION : Redirection vers l'espace du candidat, pas vers l'administration !
             router.push("/profile");
         }
         setLoading(false);
