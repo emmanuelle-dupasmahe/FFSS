@@ -33,10 +33,10 @@ export default async function InscriptionDetailPage({
     // 2. Récupération des données (avec paiements inclus pour le FinancePanel)
     const ins = await prisma.inscription.findUnique({
         where: { id: id },
-        include: { 
-            formation: true, 
+        include: {
+            formation: true,
             user: true,
-            paiements: { orderBy: { createdAt: "desc" } } 
+            paiements: { orderBy: { createdAt: "desc" } }
         }
     });
 
@@ -55,7 +55,9 @@ export default async function InscriptionDetailPage({
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 {/* COLONNE GAUCHE : INFOS CANDIDAT & MESSAGE */}
-                <div className="lg:col-span-2 space-y-8 sticky top-18 self-start">
+                {/* 🪛 CORRECTION ICI : Ajout des préfixes lg: pour ne coller que sur ordinateur */}
+                <div className="lg:col-span-2 space-y-8 lg:sticky lg:top-18 lg:self-start">
+
                     {/* CARTE PRINCIPALE */}
                     <section className="bg-[#00122e]/50 border border-white/5 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 opacity-5">

@@ -11,8 +11,9 @@ export default async function DevisFormationPage({ params }: { params: { id: str
         include: {
             formation: true,
             user: true,
+            session: true, // On demande les infos de la session
             paiements: { orderBy: { createdAt: "desc" } }
-        } 
+        }
     });
 
     if (!inscription) notFound();

@@ -27,8 +27,16 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
     const isStructure = inscription.typeDemande === "STRUCTURE";
     const titre = inscription.formation?.title?.toUpperCase() || "";
 
+    // 🪛 NOUVEAU : Récupération et formatage des dates de la session choisie
+    let datesSession = "";
+    if (inscription.session) {
+        const start = new Date(inscription.session.startDate).toLocaleDateString('fr-FR');
+        const end = inscription.session.endDate ? new Date(inscription.session.endDate).toLocaleDateString('fr-FR') : start;
+        datesSession = start === end ? `\nSession : Le ${start}` : `\nSession : Du ${start} au ${end}`;
+    }
+
     let basePrice = 0;
-    let descriptionBase = `Formation : ${inscription.formation?.title || "Inconnue"}`;
+    let descriptionBase = `Formation : ${inscription.formation?.title || "Inconnue"}${datesSession}`;
     let baseRemise = 0;
 
     // Déduction du prix selon tes règles
@@ -37,7 +45,7 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
             basePrice = 170;
         } else if (!inscription.hasPSE1) {
             basePrice = 500;
-            descriptionBase += " (Inclut PSE1 + Réglementation)";
+            descriptionBase += "\n(Inclut PSE1 + Réglementation)";
         } else {
             basePrice = 350;
         }
@@ -72,9 +80,15 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
         numero: `DEV-FORM-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
         date: new Date().toISOString().split('T')[0],
         clientNom: isStructure ? inscription.structureName : (inscription.user?.name || "Client"),
-        clientAdresse: inscription.location || "Adresse à compléter...",
+        clientAdresse: isStructure ? (inscription.location || "Adresse à compléter...") : "",
         email: inscription.user?.email || ""
     });
+
+    // 🪛 AJOUT : Infos bancaires pour le devis
+    const factureInfos = {
+        iban: "FR76 3000 4000 0012 3456 7890 123",
+        note: "Merci d'indiquer le n° du devis et le nom du candidat en libellé du virement."
+    };
 
     // --- 2. GESTION DES ACTIONS ---
     const ajouterLigne = () => setLignes([...lignes, { id: Date.now(), description: "Frais de dossier...", quantite: 1, prixUnitaire: 0, remisePct: 0 }]);
@@ -105,11 +119,9 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
         toast.loading("Création du PDF officiel et envoi de l'e-mail...", { id: "send-devis" });
 
         try {
-            // 1. On cible la VRAIE feuille officielle cachée en bas
             const element = document.getElementById("zone-pdf-officiel");
             if (!element) throw new Error("Feuille officielle introuvable");
 
-            // 🪄 LE TOUR DE MAGIE : On la fait apparaître temporairement
             element.classList.remove("only-print");
             element.style.width = "210mm";
             element.style.minHeight = "297mm";
@@ -118,7 +130,6 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
             element.style.left = "0";
             element.style.zIndex = "-9999";
 
-            // 2. On prend la photo avec le NOUVEL outil (compatible Tailwind v4)
             const imgData = await htmlToImage.toJpeg(element, {
                 quality: 0.8,
                 pixelRatio: 2,
@@ -126,7 +137,6 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
                 skipFonts: true
             });
 
-            // 🪄 FIN DU TOUR DE MAGIE : On recache la feuille
             element.style.width = "";
             element.style.minHeight = "";
             element.style.position = "";
@@ -135,21 +145,15 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
             element.style.zIndex = "";
             element.classList.add("only-print");
 
-            // 3. On crée un document PDF vierge au format A4
             const pdf = new jsPDF({
                 orientation: "portrait",
                 unit: "mm",
                 format: "a4",
             });
 
-            // 4. On colle la photo directement au format A4 (210x297 mm)
             pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
-
-            // 5. On convertit le fichier en base64
             const pdfBase64 = pdf.output("datauristring");
 
-            // 6. On transmet le Base64 à notre action serveur !
-            // 🪛 On ajoute `totalFinal` à la fin de la parenthèse pour l'envoyer au serveur !
             const result = await processAndSendFormationDevis(inscription.id, emailBody, pdfBase64, totalFinal);
 
             if (result.success) {
@@ -223,7 +227,7 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
                     <div className="p-6 bg-white dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10 space-y-4">
                         <Label className="text-[10px] font-black uppercase text-blue-600">Candidat / Structure</Label>
                         <Input value={infos.clientNom} onChange={(e) => setInfos({ ...infos, clientNom: e.target.value })} className="dark:bg-[#001A3D] font-bold" />
-                        <Textarea value={infos.clientAdresse} onChange={(e) => setInfos({ ...infos, clientAdresse: e.target.value })} className="dark:bg-[#001A3D]" />
+                        <Textarea value={infos.clientAdresse} onChange={(e) => setInfos({ ...infos, clientAdresse: e.target.value })} placeholder="Détails du contact ou adresse (facultatif)" className="dark:bg-[#001A3D]" />
                     </div>
 
                     <div className="p-6 bg-white dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10 space-y-4">
@@ -241,7 +245,7 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
                             </div>
                             {lignes.map((l) => (
                                 <div key={l.id} className="grid grid-cols-12 gap-2 items-start">
-                                    <Textarea value={l.description} onChange={(e) => modifierLigne(l.id, 'description', e.target.value)} className="col-span-6 text-xs dark:bg-[#001A3D] min-h-[40px] resize-none" />
+                                    <Textarea value={l.description} onChange={(e) => modifierLigne(l.id, 'description', e.target.value)} className="col-span-6 text-xs dark:bg-[#001A3D] min-h-[60px] resize-none" />
                                     <Input type="number" value={l.quantite} onChange={(e) => modifierLigne(l.id, 'quantite', Number(e.target.value))} className="col-span-2 text-xs text-center dark:bg-[#001A3D]" />
                                     <Input type="number" value={l.prixUnitaire} onChange={(e) => modifierLigne(l.id, 'prixUnitaire', Number(e.target.value))} className="col-span-2 text-xs text-center dark:bg-[#001A3D]" />
                                     <div className="col-span-2 flex gap-1 items-center">
@@ -264,14 +268,13 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
                 </div>
 
                 {/* --- APERÇU ÉCRAN (Sans le "zone-pdf") --- */}
-                {/* 🚨 CORRECTION IMPRESSION : Ajout de print:text-black print:bg-white */}
                 <div className="preview-paper bg-white rounded-[3rem] p-12 flex flex-col shadow-2xl sticky top-8 print:text-black print:bg-white text-slate-900">
                     <div className="flex justify-between items-start border-b-2 pb-8 mb-8 border-slate-200 print:border-black">
                         <img src="/log_asstsf.png" alt="Logo" className="w-16 h-16 object-contain" />
                         <div className="text-right">
                             <h3 className="text-2xl font-black italic text-blue-600 uppercase">Devis Formation</h3>
                             <p className="text-xs font-bold uppercase tracking-widest">{infos.numero}</p>
-                            <p className="text-[9px] text-slate-400 print:text-slate-500">Émis le {new Date(infos.date).toLocaleDateString()}</p>
+                            <p className="text-[9px] text-slate-400 print:text-slate-500">Émis le {new Date(infos.date).toLocaleDateString('fr-FR')}</p>
                         </div>
                     </div>
 
@@ -308,18 +311,27 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
 
                     <div className="mt-8 pt-6 border-t-2 border-slate-200 print:border-black">
                         <div className="flex justify-between items-end">
-                            <div className="text-[10px] uppercase font-bold text-slate-400 print:text-slate-500">
-                                {totalRemise > 0 && <p className="text-emerald-600 print:text-emerald-700">Économie réalisée : {totalRemise.toFixed(2)} €</p>}
+                            <div className="text-[10px] uppercase font-bold text-slate-400 print:text-slate-500 space-y-1">
+                                <p>Validité de l'offre : 30 jours</p>
+                                <p>Exonération de TVA - Article 261-7-1 du CGI</p>
+                                {totalRemise > 0 && <p className="text-emerald-600 print:text-emerald-700 mt-2">Économie réalisée : {totalRemise.toFixed(2)} €</p>}
                             </div>
                             <div className="text-right">
                                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 block mb-1">Total Net Estimé</span>
                                 <div className="text-4xl font-black italic tracking-tighter">{totalFinal.toFixed(2)} €</div>
                             </div>
                         </div>
+                        {/* 🪛 NOUVEAU : BLOC INFOS PAIEMENT */}
+                        <div className="mt-4 pt-4 border-t border-slate-100 print:border-slate-200">
+                            <p className="text-[9px] font-bold text-gray-500 uppercase leading-relaxed">
+                                Règlement par virement ou chèque à l'ordre de l'ASSTSF<br />
+                                IBAN : {factureInfos.iban}<br />
+                                <span className="italic font-normal">{factureInfos.note}</span>
+                            </p>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-10 mt-10">
-                        {/* 🪛 MODIFICATION ICI : Aperçu Écran */}
                         <div className="border-t-2 border-black pt-4">
                             <p className="text-[10px] font-black uppercase underline italic mb-2">Le Candidat / La Structure (Bon pour accord) :</p>
 
@@ -343,19 +355,17 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
 
                         <div className="border-t-2 border-black pt-4">
                             <p className="text-[10px] font-black uppercase underline italic mb-2">Pour l'ASSTSF (Le Centre de Formation) :</p>
-                            {/* 🪄 ZONE CACHET ET SIGNATURE */}
                             <div className="relative h-20 mb-2 w-full">
                                 <img src="/cachet-asso.png" alt="Cachet ASSTSF" className="absolute top-0 left-0 w-20 h-20 object-contain opacity-80 mix-blend-multiply" />
                                 <img src="/pres.png" alt="Signature Président" className="absolute top-2 left-10 w-28 h-auto object-contain mix-blend-multiply" />
                             </div>
-                            <p className="text-[8px] text-gray-400">Fait le {new Date(infos.date).toLocaleDateString()}</p>
+                            <p className="text-[8px] text-gray-400">Fait le {new Date(infos.date).toLocaleDateString('fr-FR')}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* --- FEUILLE PDF OFFICIELLE (Avec le "zone-pdf-officiel") --- */}
-            {/* 🚨 CORRECTION IMPRESSION : Ajout de print:text-black */}
             <div id="zone-pdf-officiel" className="only-print bg-white text-black print:text-black font-sans p-[15mm]">
                 <div className="flex justify-between items-center border-b-4 border-black pb-8 mb-10">
                     <img src="/log_asstsf.png" alt="Logo" className="w-20 h-20 object-contain" />
@@ -369,8 +379,9 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
                     <div>
                         <p className="text-[10px] font-black uppercase text-gray-400 mb-2">Centre de formation :</p>
                         <p className="text-sm font-black">ASSTSF</p>
-                        <p className="text-xs">Agréé Sécurité Civile</p>
-                        <p className="text-xs font-bold mt-2">SIRET 411 371 422 00015</p>
+                        <p className="text-xs">Affiliée FFSS</p>
+                        <p className="text-xs">Agréée Sécurité Civile</p>
+                        <p className="text-xs font-bold mt-2">SIRET 401 715 107 00033</p>
                     </div>
                     <div className="text-right">
                         <p className="text-[10px] font-black uppercase text-gray-400 mb-2">Destinataire :</p>
@@ -408,8 +419,8 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
                     </div>
                 )}
 
-                <div className="border-t-4 border-black pt-6 flex justify-between items-start mb-20">
-                    <div className="text-[9px] font-bold text-gray-400 uppercase leading-relaxed">
+                <div className="border-t-4 border-black pt-6 flex justify-between items-start mb-10">
+                    <div className="text-[9px] font-bold text-gray-400 uppercase leading-relaxed space-y-1">
                         <p>Validité de l'offre : 30 jours</p>
                         <p>Exonération de TVA - Article 261-7-1 du CGI</p>
                     </div>
@@ -419,8 +430,16 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
                     </div>
                 </div>
 
+                {/* 🪛 NOUVEAU : BLOC INFOS PAIEMENT SUR LE PDF */}
+                <div className="mb-16">
+                    <div className="text-[9px] font-bold text-gray-500 uppercase leading-relaxed p-4 bg-gray-50 rounded-xl border border-gray-200">
+                        <p className="text-black">Règlement par virement ou chèque à l'ordre de l'ASSTSF</p>
+                        <p>IBAN : {factureInfos.iban}</p>
+                        <p className="italic font-normal mt-1">{factureInfos.note}</p>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-10">
-                    {/* 🪛 MODIFICATION ICI : Zone PDF Officielle */}
                     <div className="border-t-2 border-black pt-4">
                         <p className="text-[10px] font-black uppercase underline italic mb-2">Le Candidat / La Structure (Bon pour accord) :</p>
 
@@ -444,14 +463,11 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
 
                     <div className="border-t-2 border-black pt-4">
                         <p className="text-[10px] font-black uppercase underline italic mb-2">Pour l'ASSTSF (Le Centre de Formation) :</p>
-
-                        {/* 🪄 ZONE CACHET ET SIGNATURE */}
                         <div className="relative h-20 mb-2 w-full">
                             <img src="/cachet-asso.png" alt="Cachet ASSTSF" className="absolute top-0 left-0 w-20 h-20 object-contain opacity-80 mix-blend-multiply" />
                             <img src="/pres.png" alt="Signature Président" className="absolute top-2 left-10 w-28 h-auto object-contain mix-blend-multiply" />
                         </div>
-
-                        <p className="text-[8px] text-gray-400">Fait le {new Date(infos.date).toLocaleDateString()}</p>
+                        <p className="text-[8px] text-gray-400">Fait le {new Date(infos.date).toLocaleDateString('fr-FR')}</p>
                     </div>
                 </div>
             </div>
