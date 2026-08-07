@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, FileSignature, Download } from "lucide-react";
+import { ArrowLeft, CheckCircle2, FileSignature, Download, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SignatureClient from "./SignatureClient";
 import DownloadPdfButton from "./DownloadPdfButton";
@@ -12,7 +12,7 @@ const getLabelP2 = (val: string | null | undefined) => {
     if (val === "Calme") return "Assis (cérémonie, spectacle …)";
     if (val === "Peu dynamique") return "Debout statique (foire, …)";
     if (val === "Dynamique") return "Debout dynamique (fête foraine, …)";
-    if (val === "Très dynamique") return "Debout très Dynamique : Dance, féria, …";
+    if (val === "Très dynamique") return "Debout très dynamique : (dance, féria, …)";
     return val || "Non renseigné";
 };
 
@@ -41,6 +41,32 @@ export default async function ConventionSignaturePage({ params }: { params: { id
 
     if (!devis || devis.user.email !== session.user.email) {
         notFound();
+    }
+
+    // 🪛 VERROUILLAGE SI LE DOSSIER EST EN ATTENTE
+    if (devis.status === "EN_ATTENTE") {
+        return (
+            <div className="max-w-3xl mx-auto space-y-8 pb-16 pt-12">
+                <Link href="/profile" className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors">
+                    <ArrowLeft size={16} /> Retour à mon espace
+                </Link>
+
+                <div className="bg-white dark:bg-[#001A3D] rounded-[2.5rem] p-12 text-center shadow-xl border border-slate-200 dark:border-white/10 flex flex-col items-center">
+                    <div className="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-500 mb-6">
+                        <Clock size={40} />
+                    </div>
+                    <h2 className="text-2xl font-black uppercase tracking-widest text-slate-900 dark:text-white mb-4">
+                        Dossier en cours d'étude
+                    </h2>
+                    <p className="text-slate-500 leading-relaxed max-w-lg mx-auto">
+                        Votre demande de dispositif a bien été transmise à nos services.
+                        Nos équipes procèdent actuellement à l'évaluation des risques (RIS) et au calcul des effectifs nécessaires.
+                        <br /><br />
+                        <strong>Vous serez notifié par e-mail</strong> dès que votre convention sera prête à être signée sur cet espace.
+                    </p>
+                </div>
+            </div>
+        );
     }
 
     // --- LOGIQUE DE CALCUL ---
@@ -260,12 +286,29 @@ export default async function ConventionSignaturePage({ params }: { params: { id
                 La présente convention a pour but de fixer les modalités de fonctionnement entre l'Association des Secouristes de la Seyne Tamaris Six-Fours et le bénéficiaire pour la mise en place d'un Dispositif Prévisionnel de Secours à personnes, ceci afin de clarifier le cadre juridique de la prestation assurée.
             </p>
 
+            {/* 🪛 NOUVEAU : La clause générique qui englobe Public ET Acteurs */}
+            <div className="mb-4 font-bold bg-yellow-50 p-3 border border-yellow-200 text-black text-[11px] space-y-2 text-justify rounded-lg">
+                <p>La mise en place de ce Dispositif Prévisionnel de Secours concerne <strong>le public et/ou les acteurs</strong> (joueurs, compétiteurs, comédiens...) de la manifestation.</p>
+                <p className="font-normal">Bien que les dispositions du Référentiel National (RNDPS) soient initialement prévues pour assurer la sécurité du public, l’organisateur fait le choix de les appliquer également à la sécurité des acteurs. L’organisateur reste libre de faire appel, en complément du présent dispositif, à tout autre moyen destiné à augmenter le niveau de sécurité.</p>
+            </div>
+
             <p className="font-bold underline text-[11px] mb-1 text-black text-left">3.2 Descriptif de l'événement :</p>
             <ul className="mb-4 list-disc ml-6 text-slate-700 text-left">
                 <li>Nom de l'événement : <strong>{devis.eventTitle}</strong></li>
                 <li>Date et heures : Du {devis.eventDate.toLocaleDateString('fr-FR')} ({devis.startTime || "--h--"}) au {devis.endDate?.toLocaleDateString('fr-FR') || devis.eventDate.toLocaleDateString('fr-FR')} ({devis.endTime || "--h--"})</li>
                 <li>Adresse Précise : <strong>{devis.location}</strong></li>
             </ul>
+
+            {/* 🪛 NOUVEAU : Ajout des articles 3.3 et 3.4 manquants */}
+            <p className="font-bold underline text-[11px] mb-1 text-black text-left">3.3 Grille d'évaluation des risques :</p>
+            <p className="mb-4 text-left text-slate-700">
+                Cet événement a fait l’objet d’une évaluation des risques dont la grille est jointe à la présente convention.
+            </p>
+
+            <p className="font-bold underline text-[11px] mb-1 text-black text-left">3.4 Autorisations :</p>
+            <p className="mb-4 text-left text-slate-700">
+                L'organisateur reconnaît posséder toutes les autorisations nécessaires au déroulement de ladite manifestation et avoir souscrit une assurance responsabilité civile organisateur.
+            </p>
 
             <p className="font-bold underline text-[11px] mb-1 text-black text-left">3.5 Responsabilités :</p>
             <p className="mb-4 text-left text-slate-700">

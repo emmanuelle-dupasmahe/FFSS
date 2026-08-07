@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboardPage() {
     const userCount = await prisma.user.count();
     const inscriptionsCount = await prisma.inscription.count({ where: { status: "EN_ATTENTE" } });

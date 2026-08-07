@@ -213,6 +213,16 @@ export async function processAndSendDpsRisAndConv(formData: FormData) {
 
         if (!devisDps) return { success: false, error: "Demande introuvable." };
 
+        // 🪛 NOUVEAU : MISE À JOUR DU STATUT EN BASE DE DONNÉES
+        await prisma.devisDPS.update({
+            where: { id: devisDpsId },
+            data: {
+                status: "TRAITE" // Fait basculer la carte du orange (EN_ATTENTE) au bleu (TRAITE)
+            }
+        });
+        revalidatePath(`/admin/devis-dps/${devisDpsId}`);
+        revalidatePath(`/admin/devis-dps`);
+
         const numeroRis = `RIS-${devisDps.id.substring(0, 5).toUpperCase()}`;
         const numeroConv = `CONV-${devisDps.id.substring(0, 5).toUpperCase()}`;
 

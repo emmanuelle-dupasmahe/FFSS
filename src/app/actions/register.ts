@@ -9,7 +9,6 @@ export async function registerUser(formData: FormData) {
   const name = formData.get("name") as string;
   const rawUserType = formData.get("userType") as string;
 
-  
   const allowedTypes = ["PARTICULIER", "STRUCTURE", "ORGANISATEUR"];
   const userType = allowedTypes.includes(rawUserType) ? rawUserType : "PARTICULIER";
 
@@ -34,8 +33,14 @@ export async function registerUser(formData: FormData) {
       },
     });
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
+
+    // 🪛 NOUVEAU : Interception spécifique de l'erreur Prisma P2002 (e-mail en doublon)
+    if (error.code === 'P2002') {
+      return { error: "Cette adresse e-mail est déjà utilisée." };
+    }
+
     return { error: "Une erreur est survenue lors de l'inscription." };
   }
 }
