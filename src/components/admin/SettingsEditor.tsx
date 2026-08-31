@@ -20,7 +20,7 @@ export default function SettingsEditor({ initialData }: { initialData: any[] }) 
         footer_phone: getVal("footer_phone") || "",
         nav_form_1_name: getVal("nav_form_1_name") || "Secourisme (GQS, PSC, PSE1, PSE2)",
         nav_form_1_href: getVal("nav_form_1_href") || "/formations#secourisme",
-        nav_form_2_name: getVal("nav_form_2_name") || "Sauvetage Aquatique (BNSSA, SSA Littoral option PES)",
+        nav_form_2_name: getVal("nav_form_2_name") || "Sauvetage Aquatique (BNSSA, SSA, SSA Littoral option PES)",
         nav_form_2_href: getVal("nav_form_2_href") || "/formations#aquatique",
         nav_form_3_name: getVal("nav_form_3_name") || "Recyclages",
         nav_form_3_href: getVal("nav_form_3_href") || "/formations#recyclages",

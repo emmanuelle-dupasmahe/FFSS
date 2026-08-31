@@ -58,7 +58,7 @@ export default async function RootLayout({
 
     navCategories = [
       { name: getVal('nav_form_1_name', 'Secourisme (GQS, PSC, PSE1, PSE2)'), href: getVal('nav_form_1_href', '/formations#secourisme') },
-      { name: getVal('nav_form_2_name', 'Sauvetage Aquatique (BNSSA, SSA Littoral option PES)'), href: getVal('nav_form_2_href', '/formations#aquatique') },
+      { name: getVal('nav_form_2_name', 'Sauvetage Aquatique (BNSSA, SSA, SSA Littoral option PES)'), href: getVal('nav_form_2_href', '/formations#aquatique') },
       { name: getVal('nav_form_3_name', 'Recyclages'), href: getVal('nav_form_3_href', '/formations#recyclages') },
     ].filter(c => c.name.trim() !== "");
   } catch (e) {
