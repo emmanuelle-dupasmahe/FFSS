@@ -19,10 +19,11 @@ interface FormationProps {
   age: string;
   description: string;
   color: string;
-  price?: number | null; 
+  price?: number | null;
   descriptionDetaillee?: string;
   epreuves?: string;
   sessions?: any[];
+  alerteMessage?: string | null; // 🪛 NOUVEAU : Le futur message personnalisé
 }
 
 export default function FormationCard({
@@ -36,46 +37,36 @@ export default function FormationCard({
   price,
   descriptionDetaillee,
   epreuves,
-  sessions = []
+  sessions = [],
+  alerteMessage
 }: FormationProps) {
 
   const hasExtraInfo = descriptionDetaillee || epreuves;
 
-  // DÉTECTION DYNAMIQUE DU MESSAGE D'ALERTE
-  const titleUpper = title.toUpperCase();
-  const isPscPse = titleUpper.includes("PSC") || titleUpper.includes("PSE");
-  const isGqs = titleUpper.includes("GQS") || titleUpper.includes("GESTES QUI SAUVENT");
-
-  let minInscritsMessage = null;
-  if (isPscPse) {
-    minInscritsMessage = "Formation maintenue sous réserve d'un minimum de 6 inscrits.";
-  } else if (isGqs) {
-    minInscritsMessage = "Formation maintenue sous réserve d'un minimum de 10 inscrits.";
-  }
+  // 🪛 FINI LE TEXTE FIGÉ : On utilise le message personnalisé de la base de données
+  const minInscritsMessage = alerteMessage;
 
   const formatSessionDate = (start: string, end: string) => {
     if (!start) return "";
     const d1 = new Date(start).toLocaleDateString('fr-FR');
 
-    // Sécurité : si la date de fin n'existe pas, on affiche juste la date de début
     if (!end) return `Le ${d1}`;
 
     const d2 = new Date(end).toLocaleDateString('fr-FR');
     if (d1 === d2) return `Le ${d1}`;
     return `Du ${d1} au ${d2}`;
   };
-// 🪛 FILTRE : On ne garde que les sessions dont la date de fin (ou début) est >= à aujourd'hui
+
   const upcomingSessions = (sessions || []).filter((s: any) => {
     const sessionDate = new Date(s.startDate);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // On remet à minuit pour inclure la journée en cours
+    today.setHours(0, 0, 0, 0);
     return sessionDate >= today;
   });
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col hover:shadow-xl transition-all duration-300 group">
 
-      {/* LA BARRE COULEUR */}
       <div
         className={`h-2 w-full ${color?.startsWith('bg-') ? color : ''}`}
         style={{ backgroundColor: !color?.startsWith('bg-') ? color : undefined }}
@@ -95,7 +86,6 @@ export default function FormationCard({
           {description}
         </p>
 
-        {/* BOUTON INFOS DÉTAILLÉES */}
         {hasExtraInfo && (
           <Dialog>
             <DialogTrigger asChild>
@@ -154,28 +144,29 @@ export default function FormationCard({
             <Calendar className="w-4 h-4 mr-3 text-blue-600" />
             <span>Âge minimum : {age}</span>
           </div>
-          {/* 🪛 NOUVEAU : AFFICHAGE CONDITIONNEL DU TARIF */}
           <div className="flex items-center text-sm text-slate-500 dark:text-slate-400">
             <Tag className="w-4 h-4 mr-3 text-blue-600" />
             <span>Tarif : <span className="text-slate-700 dark:text-slate-200 font-bold">{price ? `${price} €` : "Sur devis"}</span></span>
           </div>
         </div>
 
-        {/* ZONE DES PROCHAINES SESSIONS */}
         <div className="pt-4 mt-4 border-t border-slate-100 dark:border-white/5">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Prochaines sessions</p>
           {upcomingSessions.length > 0 ? (
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {upcomingSessions.slice(0, 3).map((s: any) => {
                 const isExam = s.details && s.details.toUpperCase().includes("EXAM");
 
                 return (
-                  <li key={s.id} className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
-                    <span className="flex-grow">{formatSessionDate(s.startDate, s.endDate)}</span>
+                  // 🪛 CORRECTION : flex-col au lieu de items-start, plus d'espace, et on enlève whitespace-nowrap
+                  <li key={s.id} className="text-xs font-bold text-slate-700 dark:text-slate-300 flex flex-col gap-1.5 pb-2 border-b border-slate-100 dark:border-white/5 last:border-0 last:pb-0">
+                    <div className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                      <span className="flex-grow">{formatSessionDate(s.startDate, s.endDate)}</span>
+                    </div>
 
                     {s.details && (
-                      <span className={`text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full whitespace-nowrap ml-2 ${isExam ? "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 border border-red-200 dark:border-red-500/30"
+                      <span className={`text-[9px] uppercase tracking-wider px-2 py-1 rounded-md ml-3.5 leading-relaxed break-words ${isExam ? "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 border border-red-200 dark:border-red-500/30"
                         : "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30"
                         }`}>
                         {s.details}
@@ -193,7 +184,6 @@ export default function FormationCard({
           )}
         </div>
 
-        {/* AFFICHAGE DYNAMIQUE DU MESSAGE D'ALERTE */}
         {minInscritsMessage && (
           <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl flex gap-2 items-start">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />

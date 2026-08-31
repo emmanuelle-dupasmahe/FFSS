@@ -235,7 +235,7 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
             <textarea rows={3} value={infos.texteArt31} onChange={e => setInfos({ ...infos, texteArt31: e.target.value })} className={inlineTextareaStyle + " mb-2"} />
 
             {typeConvention === 'PUBLIC' ? (
-                <p className="mb-4 font-bold bg-yellow-50 p-2 border border-yellow-200 text-black text-[12px]">La mise en place du Dispositif Prévisionnel de Secours concerne le public de la manifestation.</p>
+                <p className="mb-4 font-bold bg-yellow-50 p-2 border border-yellow-200 text-black text-[12px]">La mise en place du Dispositif Prévisionnel de Secours concerne le public (spectateur) de la manifestation.</p>
             ) : (
                 <div className="mb-4 font-bold bg-yellow-50 p-2 border border-yellow-200 text-black text-[12px] space-y-2 text-justify">
                     <p>La mise en place du Dispositif Prévisionnel de Secours concerne les acteurs de la manifestation (joueurs, compétiteurs, comédiens, ...).</p>

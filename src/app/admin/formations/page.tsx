@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import FormationInscrits from "@/components/admin/FormationInscrits";
 import FormationRessources from "@/components/admin/FormationRessources";
 import FormationSessions from "@/components/admin/FormationSessions";
+import FormationAlerte from "@/components/admin/FormationAlerte";
 
 interface Formation {
   id: string;
@@ -152,8 +153,8 @@ export default function AdminFormationsPage() {
             onClick={() => setSelectedId(f.id)}
             variant={selectedId === f.id ? "default" : "outline"}
             className={`whitespace-nowrap transition-all duration-300 ${selectedId === f.id
-                ? "bg-primary text-white shadow-md font-bold scale-105"
-                : "bg-card text-slate-500 hover:text-primary hover:bg-primary/5"
+              ? "bg-primary text-white shadow-md font-bold scale-105"
+              : "bg-card text-slate-500 hover:text-primary hover:bg-primary/5"
               }`}
           >
             <BookOpen className="w-3 h-3 mr-2 opacity-70" />
@@ -247,13 +248,19 @@ export default function AdminFormationsPage() {
               <AccordionItem value="inscrits" className="border rounded-xl px-4">
                 <AccordionTrigger className="text-[10px] font-black uppercase tracking-widest text-slate-500">Gestion des inscrits</AccordionTrigger>
                 <AccordionContent className="h-auto overflow-visible">
-                    <FormationInscrits inscriptions={selectedFormation.inscriptions || []} />
+                  <FormationInscrits inscriptions={selectedFormation.inscriptions || []} />
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="ressources" className="border rounded-xl px-4">
-                <AccordionTrigger className="text-[10px] font-black uppercase tracking-widest text-slate-500">Ressources & PDF</AccordionTrigger>
-                <AccordionContent><FormationRessources formationId={selectedFormation.id} initialRessources={selectedFormation.ressources || []} /></AccordionContent>
+                <AccordionTrigger className="text-[10px] font-black uppercase tracking-widest text-slate-500">Ressources & Alertes</AccordionTrigger>
+                <AccordionContent><FormationRessources formationId={selectedFormation.id} initialRessources={selectedFormation.ressources || []} />
+                  {/*LE NOUVEAU COMPOSANT*/}
+                  <FormationAlerte
+                    formationId={selectedFormation.id}
+                    initialAlerte={selectedFormation.alerteMessage}
+                  />
+                </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="sessions" className="border rounded-xl px-4">

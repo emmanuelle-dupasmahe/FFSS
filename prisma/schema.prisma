@@ -92,6 +92,7 @@ model Formation {
   descriptionDetaillee String?  @db.Text
   epreuves            String?  @db.Text
   sessions     Session[]
+  alerteMessage String?  @db.Text
 
   // Relation
   inscriptions Inscription[] //  Liste des candidats inscrits

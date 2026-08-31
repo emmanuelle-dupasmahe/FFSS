@@ -160,3 +160,22 @@ export async function deleteInscription(id: string) {
         return { error: "Erreur lors de la suppression du dossier." };
     }
 }
+/**
+ * Met à jour le message d'alerte personnalisé (ex: Minimum d'inscrits)
+ */
+export async function updateFormationAlerte(formationId: string, alerteMessage: string) {
+    try {
+        await prisma.formation.update({
+            where: { id: formationId },
+            data: { alerteMessage: alerteMessage === "" ? null : alerteMessage }
+        });
+
+        revalidatePath(`/admin/formations/${formationId}`);
+        revalidatePath(`/formations`);
+
+        return { success: true };
+    } catch (error) {
+        console.error("ERREUR updateFormationAlerte:", error);
+        return { error: "Erreur lors de la sauvegarde du message d'alerte." };
+    }
+}

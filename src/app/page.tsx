@@ -126,7 +126,7 @@ export default async function HomePage() {
                 <span className="px-3 py-1.5 bg-amber-500/5 dark:bg-amber-500/10 text-[9px] font-black uppercase tracking-widest rounded-xl text-amber-700 dark:text-amber-400 border border-amber-500/10">PSC</span>
                 <span className="px-3 py-1.5 bg-amber-500/5 dark:bg-amber-500/10 text-[9px] font-black uppercase tracking-widest rounded-xl text-amber-700 dark:text-amber-400 border border-amber-500/10">PSE1</span>
                 <span className="px-3 py-1.5 bg-amber-500/5 dark:bg-amber-500/10 text-[9px] font-black uppercase tracking-widest rounded-xl text-amber-700 dark:text-amber-400 border border-amber-500/10">PSE2</span>
-                <span className="px-3 py-1.5 bg-amber-500/5 dark:bg-amber-500/10 text-[9px] font-black uppercase tracking-widest rounded-xl text-amber-700 dark:text-amber-400 border border-amber-500/10">BNSSA</span>
+                <span className="px-3 py-1.5 bg-amber-500/5 dark:bg-amber-500/10 text-[9px] font-black uppercase tracking-widest rounded-xl text-amber-700 dark:text-amber-400 border border-amber-500/10">SSA</span>
                 <span className="px-3 py-1.5 bg-amber-500/5 dark:bg-amber-500/10 text-[9px] font-black uppercase tracking-widest rounded-xl text-amber-700 dark:text-amber-400 border border-amber-500/10">SSA Littoral mention PES</span>
               </div>
             </div>

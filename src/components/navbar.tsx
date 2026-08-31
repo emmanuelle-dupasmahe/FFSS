@@ -29,7 +29,7 @@ export default function Navbar({ navCategories }: { navCategories?: { name: stri
 
     const defaultCategories = [
         { name: "Secourisme (GQS, PSC, PSE1, PSE2)", href: "/formations#secourisme" },
-        { name: "Sauvetage Aquatique (BNSSA, SSA Littoral option PES)", href: "/formations#aquatique" },
+        { name: "Sauvetage Aquatique (SSA, SSA Littoral option PES)", href: "/formations#aquatique" },
         { name: "Recyclages", href: "/formations#recyclages" },
     ];
 

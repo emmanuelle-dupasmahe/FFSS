@@ -288,7 +288,7 @@ export default async function ConventionSignaturePage({ params }: { params: { id
 
             {devis.typeConvention === 'PUBLIC' ? (
                 <p className="mb-4 font-bold bg-yellow-50 p-2 border border-yellow-200 text-black text-[12px] rounded-lg">
-                    La mise en place du Dispositif Prévisionnel de Secours concerne le public de la manifestation.
+                    La mise en place du Dispositif Prévisionnel de Secours concerne le public (spectateur) de la manifestation.
                 </p>
             ) : (
                 <div className="mb-4 font-bold bg-yellow-50 p-2 border border-yellow-200 text-black text-[12px] space-y-2 text-justify rounded-lg">
