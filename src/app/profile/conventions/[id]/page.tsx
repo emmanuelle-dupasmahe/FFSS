@@ -286,11 +286,16 @@ export default async function ConventionSignaturePage({ params }: { params: { id
                 La présente convention a pour but de fixer les modalités de fonctionnement entre l'Association des Secouristes de la Seyne Tamaris Six-Fours et le bénéficiaire pour la mise en place d'un Dispositif Prévisionnel de Secours à personnes, ceci afin de clarifier le cadre juridique de la prestation assurée.
             </p>
 
-            {/* 🪛 NOUVEAU : La clause générique qui englobe Public ET Acteurs */}
-            <div className="mb-4 font-bold bg-yellow-50 p-3 border border-yellow-200 text-black text-[11px] space-y-2 text-justify rounded-lg">
-                <p>La mise en place de ce Dispositif Prévisionnel de Secours concerne <strong>le public et/ou les acteurs</strong> (joueurs, compétiteurs, comédiens...) de la manifestation.</p>
-                <p className="font-normal">Bien que les dispositions du Référentiel National (RNDPS) soient initialement prévues pour assurer la sécurité du public, l’organisateur fait le choix de les appliquer également à la sécurité des acteurs. L’organisateur reste libre de faire appel, en complément du présent dispositif, à tout autre moyen destiné à augmenter le niveau de sécurité.</p>
-            </div>
+            {devis.typeConvention === 'PUBLIC' ? (
+                <p className="mb-4 font-bold bg-yellow-50 p-2 border border-yellow-200 text-black text-[12px] rounded-lg">
+                    La mise en place du Dispositif Prévisionnel de Secours concerne le public de la manifestation.
+                </p>
+            ) : (
+                <div className="mb-4 font-bold bg-yellow-50 p-2 border border-yellow-200 text-black text-[12px] space-y-2 text-justify rounded-lg">
+                    <p>La mise en place du Dispositif Prévisionnel de Secours concerne les acteurs de la manifestation (joueurs, compétiteurs, comédiens, ...).</p>
+                    <p className="font-normal">Bien que les dispositions du Référentiel National Dispositifs prévisionnels de Secours soient uniquement prises pour assurer la sécurité du public, il convient à l’organisateur de la manifestation d’apprécier l’opportunité de les appliquer à la sécurité des acteurs, en l’absence de dispositions réglementaires plus contraignantes. En outre, l’organisateur est libre de faire appel, en complément du DPS à personnes prescrit, à tout autre moyen humain ou matériel, destiné à augmenter le niveau de sécurité de la manifestation.</p>
+                </div>
+            )}
 
             <p className="font-bold underline text-[11px] mb-1 text-black text-left">3.2 Descriptif de l'événement :</p>
             <ul className="mb-4 list-disc ml-6 text-slate-700 text-left">

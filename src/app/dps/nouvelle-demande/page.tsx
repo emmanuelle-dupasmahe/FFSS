@@ -257,14 +257,11 @@ export default function NouvelleDemandeDPS() {
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Public attendu</label>
                 <Input name="public" required type="number" placeholder="Nbre max. simultané" className="rounded-xl border-slate-200" />
 
-                {/* 🆕 NOTE D'INFORMATION */}
-                <p className="text-[9px] text-slate-500 leading-relaxed italic pl-1 bg-slate-50 dark:bg-white/5 p-2 rounded-lg border border-slate-100 dark:border-white/5">
-                  {/* 🆕 NOTE D'INFORMATION */}
-                  <p className="text-[9px] text-slate-500 leading-relaxed italic pl-1 bg-slate-50 dark:bg-white/5 p-2 rounded-lg border border-slate-100 dark:border-white/5">
-                    <span className="font-bold text-slate-700 dark:text-slate-300">Public :</span> Nombre de personnes qui <span className="text-red-600 font-semibold not-italic">assistent</span> à un spectacle, une manifestation, un rendez-vous sportif, une réunion, ... <br />
-                    <span className="font-bold text-slate-700 dark:text-slate-300">Acteurs :</span> Nombre de personnes qui <span className="text-red-600 font-semibold not-italic">participent et concourent</span> à la manifestation : sportifs, artistes, organisateurs, bénévoles, ... <br />
-                  </p>
-                </p>
+                {/* 🆕 NOTE D'INFORMATION (Corrigée pour l'hydratation) */}
+                <div className="text-[9px] text-slate-500 leading-relaxed italic p-2 mt-2 rounded-lg border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/5">
+                  <span className="font-bold text-slate-700 dark:text-slate-300">Public :</span> Nombre de personnes qui <span className="text-red-600 font-semibold not-italic">assistent</span> à un spectacle, une manifestation, un rendez-vous sportif, une réunion, ... <br />
+                  <span className="font-bold text-slate-700 dark:text-slate-300">Acteurs :</span> Nombre de personnes qui <span className="text-red-600 font-semibold not-italic">participent et concourent</span> à la manifestation : sportifs, artistes, organisateurs, bénévoles, ... <br />
+                </div>
               </div>
             </div>
 

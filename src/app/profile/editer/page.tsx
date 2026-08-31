@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,36 +8,73 @@ import { User, Mail, Phone, Building, Save, ArrowLeft, Loader2, ShieldCheck } fr
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { getUserProfile, updateUserProfile } from "./actions";
 
 export default function EditerProfilPage() {
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
 
-    // États locaux pour le formulaire (pré-remplis pour faire réaliste lors de la démo)
     const [formData, setFormData] = useState({
-        name: "Essai Signature",
-        email: "test.asstsf@gmail.com",
-        phone: "06 12 34 56 78",
-        structure: "Mairie de la Seyne",
+        name: "",
+        email: "",
+        phone: "",
+        structure: "",
     });
 
-    const handleSave = (e: React.FormEvent) => {
+    // 🔄 ÉTAPE 1 : Récupération des vraies données au chargement
+    useEffect(() => {
+        async function loadData() {
+            const user = await getUserProfile();
+            if (user) {
+                setFormData({
+                    name: user.name || "",
+                    email: user.email || "",
+                    phone: user.phone || "",       // Remplacé par les vraies infos en DB
+                    structure: user.structure || "", // Remplacé par les vraies infos en DB
+                });
+            }
+            setIsLoading(false);
+        }
+        loadData();
+    }, []);
+
+    // 💾 ÉTAPE 2 : Sauvegarde dans la base de données
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSaving(true);
 
-        // 🪄 Simulation parfaite d'un appel serveur pour la démonstration
-        setTimeout(() => {
+        const result = await updateUserProfile({
+            name: formData.name,
+            phone: formData.phone,
+            structure: formData.structure,
+        });
+
+        if (result.error) {
+            toast.error(result.error);
+            setIsSaving(false);
+        } else {
             toast.success("Vos informations ont été mises à jour avec succès !", {
                 icon: <ShieldCheck className="text-emerald-500" />
             });
             setIsSaving(false);
 
-            // Retour automatique vers le tableau de bord après 1 seconde
+            // Retour au profil avec un petit rafraîchissement
             setTimeout(() => {
-                router.back();
+                router.push("/profile");
+                router.refresh();
             }, 1000);
-        }, 1500);
+        }
     };
+
+    // Écran de chargement le temps d'aller chercher la base de données
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#001A3D]">
+                <Loader2 className="animate-spin text-blue-600" size={32} />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#001A3D] p-4 md:p-8 transition-colors duration-300">
@@ -66,12 +103,9 @@ export default function EditerProfilPage() {
 
                 {/* Carte du Formulaire */}
                 <form onSubmit={handleSave} className="bg-white dark:bg-white/5 rounded-[2rem] p-8 shadow-xl border border-slate-200 dark:border-white/10 space-y-6 relative overflow-hidden">
-
-                    {/* Décoration d'arrière-plan */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-
                         {/* Champ Nom */}
                         <div className="space-y-2 md:col-span-2">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
@@ -85,7 +119,7 @@ export default function EditerProfilPage() {
                             />
                         </div>
 
-                        {/* Champ Email */}
+                        {/* Champ Email (Bloqué pour la sécurité) */}
                         <div className="space-y-2">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
                                 <Mail size={14} className="text-blue-600" /> Adresse Email
@@ -93,9 +127,8 @@ export default function EditerProfilPage() {
                             <Input
                                 type="email"
                                 value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="h-12 bg-slate-50 dark:bg-[#001A3D] border-slate-200 dark:border-white/10 font-bold dark:text-white rounded-xl"
-                                required
+                                disabled // Bloqué car modifier l'e-mail casserait la session utilisateur
+                                className="h-12 bg-slate-100 dark:bg-[#001A3D]/50 border-slate-200 dark:border-white/10 font-bold dark:text-white/50 rounded-xl cursor-not-allowed opacity-70"
                             />
                         </div>
 
@@ -144,7 +177,6 @@ export default function EditerProfilPage() {
                         </Button>
                     </div>
                 </form>
-
             </div>
         </div>
     );

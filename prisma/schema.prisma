@@ -17,7 +17,8 @@ model User {
   email         String    @unique
   passwordHash  String    
   name          String?   
-  phone         String?   
+  phone         String?  
+  structure     String? 
   image         String?   
   userType      String?   @default("PARTICULIER") 
   isStudent     Boolean   @default(false) 
@@ -152,6 +153,9 @@ model DevisDPS {
   description     String   @db.Text
   // 🆕 Montant financier
   totalMontant    Float?
+
+  //Type de convention (PUBLIC ou ACTEUR)
+  typeConvention  String   @default("PUBLIC")
   
   // Relation avec l'utilisateur
   userId          String

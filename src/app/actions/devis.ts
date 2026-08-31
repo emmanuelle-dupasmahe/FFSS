@@ -271,3 +271,69 @@ export async function updateDpsLogistics(id: string, data: { expectedPublic: num
         return { success: false, error: error.message };
     }
 }
+// ============================================================================
+// 7. DPS : CHOIX DU TYPE DE CONVENTION (PUBLIC / ACTEUR)
+// ============================================================================
+export async function updateTypeConvention(id: string, type: 'PUBLIC' | 'ACTEUR') {
+    try {
+        await prisma.devisDPS.update({
+            where: { id },
+            data: { typeConvention: type }
+        });
+        revalidatePath(`/admin/devis-dps/${id}`);
+        return { success: true };
+    } catch (error: any) {
+        console.error(error);
+        return { success: false, error: error.message };
+    }
+}
+// ============================================================================
+// 8. DPS : MISE À JOUR DES COORDONNÉES DE L'ORGANISATEUR
+// ============================================================================
+export async function updateDevisContactInfo(
+    id: string,
+    data: { organisme: string, contactNom: string, contactTel: string, contactEmail: string }
+) {
+    try {
+        await prisma.devisDPS.update({
+            where: { id },
+            data: {
+                organismeDemandeur: data.organisme,
+                nomContact: data.contactNom,
+                telephoneContact: data.contactTel,
+                emailContact: data.contactEmail,
+            }
+        });
+        revalidatePath(`/admin/devis-dps/${id}`);
+        return { success: true };
+    } catch (error: any) {
+        console.error(error);
+        return { success: false, error: error.message };
+    }
+}
+// ============================================================================
+// 9. DPS : MISE À JOUR DES DÉTAILS DE L'ÉVÉNEMENT
+// ============================================================================
+export async function updateDevisEventInfo(
+    id: string,
+    data: { eventNom: string, eventLieu: string, dateDebut: Date, dateFin: Date | null, heureDebut: string, heureFin: string }
+) {
+    try {
+        await prisma.devisDPS.update({
+            where: { id },
+            data: {
+                eventTitle: data.eventNom,
+                location: data.eventLieu,
+                eventDate: data.dateDebut,
+                endDate: data.dateFin,
+                startTime: data.heureDebut,
+                endTime: data.heureFin
+            }
+        });
+        revalidatePath(`/admin/devis-dps/${id}`);
+        return { success: true };
+    } catch (error: any) {
+        console.error(error);
+        return { success: false, error: error.message };
+    }
+}
