@@ -25,7 +25,9 @@ export default async function ChiffragePage({ params }: { params: { id: string }
     const p_lisse = p1 <= 100000 ? p1 : 100000 + (p1 - 100000) / 2;
     const ris = (p2 + e1 + e2) * (p_lisse / 1000);
 
-    let effectif = ris <= 1.125 ? 2 : Math.max(4, Math.ceil(ris / 2) * 2);
+    // Si RIS <= 0.25 c'est un PAPS (2 personnes), au-delà on est en PE (minimum 4 personnes)
+    let effectif = ris <= 0.25 ? 2 : Math.max(4, Math.ceil(ris / 2) * 2);
+
     if (ris > 12) effectif = Math.max(12, Math.ceil(ris / 2) * 2);
     if (ris > 36) effectif = Math.max(36, Math.ceil(ris / 2) * 2);
 

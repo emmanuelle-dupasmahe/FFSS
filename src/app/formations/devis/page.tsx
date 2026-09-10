@@ -307,14 +307,14 @@ function DevisFormationForm() {
                     <div className="space-y-3">
                         {!isStructure ? (
                             <>
-                                {isSSA && (
+                                {/* {isSSA && (
                                     <div className="flex gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl mb-4 animate-in zoom-in-95">
                                         <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
                                         <p className="text-[9px] text-amber-700 dark:text-amber-400 font-bold leading-tight uppercase italic">
                                             Le SSA nécessite impérativement le BNSSA et le PSE2 à jour.
                                         </p>
                                     </div>
-                                )}
+                                )} */}
 
                                 {isSSA && (
                                     <div onClick={() => setHasBNSSA(!hasBNSSA)} className={`flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all ${hasBNSSA ? 'border-primary bg-primary/5 shadow-sm' : 'border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5'}`}>

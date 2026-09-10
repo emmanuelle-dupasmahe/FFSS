@@ -72,6 +72,14 @@ export default async function DetailDevisPage({ params }: { params: { id: string
     return val || "Non renseigné";
   };
 
+  const getLabelE2 = (val: number) => {
+    if (val === 0.25) return "Moins de 10 minutes";
+    if (val === 0.30) return "De 10 à 20 minutes";
+    if (val === 0.35) return "De 20 à 30 minutes";
+    if (val >= 0.40) return "Supérieur à 30 minutes";
+    return "Non renseigné";
+  };
+
   return (
     <div className="print:p-0 print:min-h-0 min-h-screen bg-slate-50 dark:bg-[#001A3D] p-4 md:p-8 transition-colors duration-300 relative">
 
@@ -444,7 +452,7 @@ export default async function DetailDevisPage({ params }: { params: { id: string
               <td className="border border-black p-1.5 font-bold">E2 - Secours publics</td>
               <td className="border border-black p-1.5 text-center font-black">{e2.toFixed(2)}</td>
               <td className="border border-black p-1.5 font-semibold text-slate-800 text-[10px]">
-                {devis.delaiSecours || "Non renseigné"}
+                {getLabelE2(e2)}
               </td>
             </tr>
             <tr className="bg-blue-50">

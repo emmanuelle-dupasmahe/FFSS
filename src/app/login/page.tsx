@@ -82,7 +82,7 @@ export default function LoginPage() {
                         <div className="grid gap-2">
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="password">Mot de passe</Label>
-                                <Link href="#" className="text-xs text-primary dark:text-blue-400 hover:underline font-medium">
+                                <Link href="/mot-de-passe-oublie" className="text-xs text-primary dark:text-blue-400 hover:underline font-medium">
                                     Oublié ?
                                 </Link>
                             </div>

@@ -21,7 +21,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 
-export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate, endDate, location, devisDpsId, devisId, id, userEmail, templateBody, organismeDemandeur, nomContact, telephoneContact, fournitLocal }: any) {
+export default function ClientChiffrage({ calculRIS, effectifInitial, eventTitle, eventDate, endDate, location, devisDpsId, devisId, id, userEmail, templateBody, organismeDemandeur, nomContact, telephoneContact, fournitLocal }: any) {
     const finalId = devisDpsId || devisId || id || effectifInitial?.devisId || effectifInitial?.id || "";
 
     // --- ÉTATS LOGISTIQUES DE BASE ---
@@ -32,7 +32,8 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
     const [hasTente, setHasTente] = useState(fournitLocal ? false : true);
     const [isHorsZone, setIsHorsZone] = useState(false);
 
-    const effectifPersonnel = (effectifInitial?.effectif || effectifInitial || 0);
+    // 🪛 CONNEXION DYNAMIQUE CORRIGÉE : On force la conversion en nombre de la propriété effectifInitial
+    const effectifPersonnel = Number(effectifInitial?.effectif || effectifInitial) || 2;
 
     // --- GESTION DES LIGNES DU DEVIS (ÉDITABLES) ---
     const [lignes, setLignes] = useState<any[]>([]);
@@ -43,8 +44,8 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
             {
                 id: 1,
                 description: "Forfait Dispositif Premiers Secours",
-                quantite: 1,
-                prixUnitaire: effectifPersonnel * heuresPrestation * tarifHoraire,
+                quantite: 1, // 🪛 Fixé à 1 pour un affichage "Forfait global"
+                prixUnitaire: effectifPersonnel * heuresPrestation * tarifHoraire, // 🪛 Le prix unitaire englobe tout le calcul (Secouristes x Heures x Tarif)
                 remisePct: 0
             }
         ];
@@ -150,6 +151,7 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
             setIsSending(false);
         }
     };
+
     const handleDownloadPDF = async () => {
         toast.loading("Génération du PDF en cours...", { id: "dl-pdf" });
         try {
@@ -342,7 +344,7 @@ export default function ClientChiffrage({ effectifInitial, eventTitle, eventDate
                     <div className="grid grid-cols-2 gap-8 mb-8">
                         <div className="text-xs text-gray-600">
                             <p className="font-black text-black uppercase mb-1">ASSTSF</p>
-                            <p>Affiliée FFSSS</p>
+                            <p>Affiliée FFSS</p>
                             <p>Agréée Sécurité Civile</p>
                         </div>
                         <div className="text-right border-r-4 border-blue-600 pr-4 bg-gray-50 p-4">
