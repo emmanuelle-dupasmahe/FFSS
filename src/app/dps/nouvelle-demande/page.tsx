@@ -312,7 +312,7 @@ export default function NouvelleDemandeDPS() {
                 <label className="text-[10px] font-black uppercase tracking-widest">Type d'activité (P2)</label>
               </div>
               <Select onValueChange={setAmbiance} required>
-                <SelectTrigger className="rounded-xl border-slate-200 bg-white dark:bg-slate-900">
+                <SelectTrigger className="rounded-xl border-slate-200 bg-white dark:bg-slate-900 w-full overflow-hidden text-ellipsis whitespace-nowrap">
                   <SelectValue placeholder="Comportement du public" />
                 </SelectTrigger>
                 <SelectContent className={selectContentStyle}>
@@ -331,7 +331,7 @@ export default function NouvelleDemandeDPS() {
                 <label className="text-[10px] font-black uppercase tracking-widest">Environnement (E1)</label>
               </div>
               <Select onValueChange={setAccessibilite} required>
-                <SelectTrigger className="rounded-xl border-slate-200 bg-white dark:bg-slate-900">
+                <SelectTrigger className="rounded-xl border-slate-200 bg-white dark:bg-slate-900 w-full overflow-hidden text-ellipsis whitespace-nowrap">
                   <SelectValue placeholder="Caractéristiques" />
                 </SelectTrigger>
                 <SelectContent className={selectContentStyle}>
@@ -350,7 +350,7 @@ export default function NouvelleDemandeDPS() {
                 <label className="text-[10px] font-black uppercase tracking-widest">Secours publics (E2)</label>
               </div>
               <Select onValueChange={setDelaiSecours} required>
-                <SelectTrigger className="rounded-xl border-slate-200 bg-white dark:bg-slate-900">
+                <SelectTrigger className="rounded-xl border-slate-200 bg-white dark:bg-slate-900 w-full overflow-hidden text-ellipsis whitespace-nowrap">
                   <SelectValue placeholder="Délai d'intervention" />
                 </SelectTrigger>
                 <SelectContent className={selectContentStyle}>

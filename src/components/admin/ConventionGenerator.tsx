@@ -19,7 +19,6 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
 
     const [inclureSignature, setInclureSignature] = useState(true);
 
-    // Formatage des dates au format YYYY-MM-DD pour que les <input type="date"> fonctionnent
     const defaultDateDebInput = demandeDPS.eventDate ? new Date(demandeDPS.eventDate).toISOString().split('T')[0] : "";
     const defaultDateFinInput = demandeDPS.endDate ? new Date(demandeDPS.endDate).toISOString().split('T')[0] : "";
 
@@ -36,7 +35,7 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
         heureDebut: demandeDPS.startTime || "",
         heureFin: demandeDPS.endTime || "",
 
-        texteArt42: `- Nombre d'intervenants secouristes : ${calculRIS?.nombreSecouristes || 0}\n- Véhicules de premiers secours : ${calculRIS?.nombreVehicules || 0} VPSP\n- Autres véhicules : 0`,
+        texteArt42: `- Nombre d'intervenants secouristes : ${calculRIS?.nombreSecouristes || 0}\n- Véhicules de premiers secours : ${calculRIS?.nombreVehicules || 0}\n- Autres véhicules : 0`,
 
         assoPresTel: "06.11.58.34.35",
         assoVpTel: "06.99.70.91.63",
@@ -44,22 +43,28 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
         assoSecTel: "06.75.69.31.12",
         assoEmail: "asst.laseyne@gmail.com",
 
-        texteIntro: "Monsieur, Madame, suite à votre demande de mise en place d'un Dispositif Prévisionnel de Secours à personnes (D.P.S), vous trouverez ci-joint deux exemplaires de la convention précisant les modalités de notre accord. Vous voudrez bien les relire et nous retourner un exemplaire signé. Dans l'attente, veuillez, Madame, Monsieur, accepter nos salutations les meilleures.",
-        texteArt1: `L'Association des Secouristes de la Seyne Tamaris Six-Fours, Adresse: 98 rue Fontaine, Square Émile Malsert, 83500 La Seyne-sur-Mer. Courriel: asst.laseyne@gmail.com. Ci-après désignée: association prestataire représentée par son président Sauveur AMICO: association ayant reçu notamment une autorisation d'exercice déconcentrée pour les missions de sécurité civile de type D par sa régulière affiliation à la Fédération Française de Sauvetage et de Secourisme (FFSS), association agréée de sécurité civile au plan national par arrêté ministériel.`,
-        texteArt31: "La présente convention a pour but de fixer les modalités de fonctionnement entre: L'Association des Secouristes de la Seyne Tamaris Six-Fours, qui peut régulièrement exercer, d'une manière déconcentrée les missions de sécurité civile pour la mise en place d'un Dispositif Prévisionnel de Secours à personnes, ceci afin de bien clarifier le cadre juridique de la prestation de service assurée.",
-        texteArt33: "Cet événement a fait l’objet d’une évaluation des risques dont la grille est jointe à la présente convention.",
+        texteIntro: "Monsieur, Madame, suite à votre demande de mise en place d'un Dispositif Prévisionnel de Secours à personnes (D.P.S), vous trouverez ci-joint, la convention précisant les modalités de notre accord. Vous voudrez bien relire les documents et nous retourner un exemplaire de chaque signé. Dans l'attente, veuillez, Madame, Monsieur, accepter nos salutations les meilleures.",
+        texteArt1: `L'Association des Secouristes de la Seyne Tamaris Six-Fours (ASSTSF), représenté par son président Sauveur AMICO, a reçu notamment une autorisation d’exercice déconcentrée pour les missions de sécurité civile de type D, par sa régulière affiliation à la Fédération Française de Sauvetage et de Secourisme (FFSS), association agréée de sécurité civile au plan national par arrêté ministériel.`,
+        texteArt31: "La présente convention a pour but de fixer les modalités de fonctionnement entre : l’organisateur et l’ASSTSF, ceci afin de bien clarifier le cadre juridique de la prestation de service assurée, et ce, conformément aux dispositions du Référentiel National relatif aux Dispositifs Prévisionnels de Secours à personnes, (RNDPS), Ministère de l’intérieur – arrêté NOR : INTE0600910A du 7 novembre 2006.",
+
+        // Nouveaux blocs textes modifiables pour l'Article 3.1
+        texteArt31Public: "La mise en place du Dispositif Prévisionnel de Secours (DPS) concerne le public spectateur de la manifestation.",
+        texteArt31Acteur1: "La mise en place du Dispositif Prévisionnel de Secours (DPS) concerne les acteurs de la manifestation (joueurs, compétiteurs, comédiens, …)",
+        texteArt31Acteur2: "Bien que les dispositions du Référentiel National relatif aux Dispositifs Prévisionnels de Secours à personnes, (RNDPS), Ministère de l’intérieur – arrêté NOR : INTE0600910A du 7 novembre 2006, soient uniquement prises pour assurer la sécurité du public (spectateur), il convient à l’organisateur de la manifestation d’apprécier l’opportunité de les appliquer à la sécurité des acteurs, en l’absence de dispositions réglementaires plus contraignantes. En outre, l’organisateur est libre de faire appel, en complément du DPS, à tout autre moyen humain ou matériel, destiné à augmenter le niveau de sécurité de la manifestation.",
+
+        texteArt33: "Cet événement a fait l'objet par l’ASSTSF d'une évaluation des risques sur la base des renseignement fournis par l’organisateur. La grille d’évaluation des risques est jointe en annexe à cette convention.",
         texteArt34: "L'organisateur reconnaît posséder toutes les autorisations nécessaires au déroulement de ladite manifestation et avoir souscrit une assurance responsabilité civile organisateur.",
         texteArt35: "Conformément aux textes réglementaires, l'organisateur est responsable de l'ensemble de l'organisation et des mesures prises en liaison avec l'autorité de police compétente (maire, préfet). La mise en place d'un dispositif de secours ne peut avoir pour conséquence un transfert de responsabilité vers l'association prestataire.",
-        texteArt41: `Pour répondre à la demande formulée par M./Mme ${demandeDPS.nomContact || demandeDPS.user?.name || ""} et au vu du résultat de la grille d'évaluation des risques renseignée, l'Association des Secouristes de la Seyne Tamaris Six-Fours, conformément aux directives du Référentiel National relatif aux Dispositifs Prévisionnels de Secours (RNDPS) - Ministère de l'intérieur arrêté NOR: INTE0600910A du 7 novembre 2006, s'engage à mettre en place le Dispositif Prévisionnel de Secours suivant :`,
-        texteArt431: "Les équipiers secouristes sont titulaires du diplôme de Premiers Secours en Équipe de niveau 2 (PSE2) et les secouristes de niveau 1 (PSE1), validés dans leur aptitude opérationnelle conformément à la réglementation. Un membre de chaque équipe exerce les fonctions de chef d'équipe.",
+        texteArt41: `Pour répondre à la demande écrite formulée par M. / Mme ${demandeDPS.nomContact || demandeDPS.user?.name || ""} et au vu du résultat de la grille d’évaluation des risques co-signée, l'ASSTSF, s’engage à mettre en place le Dispositif Prévisionnel de Secours du type suivant :`,
+        texteArt431: "Les équipiers secouristes sont titulaires du diplôme de Premiers Secours en Equipe de niveau 2 (PSE2) et les secouristes sont titulaires du diplôme de Premiers Secours en Equipe de niveau 1 (PSE1), validés dans leur aptitude opérationnelle conformément à la réglementation. Un membre de chaque équipe exerce les fonctions de chef d’équipe.",
         texteArt432: "Les différents lots de matériels mis à disposition sont conformes au RNDPS du 7 novembre 2006.",
-        texteArt44: "1° Reconnaître et analyser la situation accidentelle.\n2° Prendre les premières mesures adaptées de sécurité.\n3° Faire un bilan et porter les premiers secours nécessaires à une victime.\n4° Prodiguer des conseils adaptés.\n5° Contribuer à la mise en place de la chaîne des secours (alerte / pouvoirs publics).\n6° Accueillir les secours et faciliter leur intervention.",
+        texteArt44: "1° Reconnaître et analyser la situation accidentelle,\n2° Prendre les premières mesures adaptées de sécurité et de protection,\n3° Faire un bilan et porter les premiers secours nécessaires à une victime,\n4° Prodiguer des conseils adaptés à une victime qui pourrait partir par ses propres moyens,\n5° Contribuer à la mise en place de la chaîne des secours (alerte / secours public),\n6° Accueillir les secours et faciliter leur intervention.",
         texteArt45: "L'association prestataire n'assurera pas le transport des victimes vers un centre hospitalier. Les éventuelles évacuations des blessés ou malades sont assurées par les services publics de secours.",
-        texteArt46: "Les intervenants sont revêtus de leur tenue officielle. Le chef de poste prendra contact avec l’organisateur ou son représentant dès son arrivée sur site pour vérifier la concordance avec les clauses techniques de la convention.",
-        texteArt51: "- 1 tente ou local à disposition des secouristes.\n- Un moyen d'appel des secours publics en cas de non couverture des mobiles.",
-        texteRepas: "Les repas et les boissons des secouristes bénévoles présents seront pris en charge par l'organisateur.",
-        texteArt53: "L’intervention des secouristes demeure bénévole (but non lucratif). Toutefois, l'organisateur dédommage l'association des frais engendrés, pour un montant défini dans le devis estimatif remis conjointement par l’association. La facture définitive sera réglée, à réception, par virement ou par chèque libellé à l’ordre de l’association.",
-        texteArt9: "En cas de litige, le contentieux pourra faire l'objet de recours devant les tribunaux compétents. Les informations recueillies font l'objet d'un traitement destiné à l'établissement de documents réglementaires. La durée de conservation des données est de 20 ans après la fin de l'événement (code de la santé publique : article R1112-7).",
+        texteArt46: "Les intervenants sont revêtus de leur tenue officielle. Le chef de poste prendra contact avec l’organisateur ou son représentant, dès son arrivée sur site, pour vérifier la concordance avec les clauses techniques de la convention, mettre en place le dispositif et déterminer les modalités opératoires liées à l’événement.",
+        texteArt51: "1 tente fermée ou 1 local à disposition des secouristes.\nAppel des secours publics : téléphones portables complétés éventuellement de radios portatives.",
+        texteRepas: "Les repas et les boissons des secouristes bénévoles présents seront pris en charge par l’organisateur.",
+        texteArt53: "L'intervention des secouristes demeure bénévole et l'action de l'association prestataire est à but non lucratif. Toutefois, l'organisateur dédommage l'association des frais engendrés (déplacements, matériel, oxygène, produits pharmaceutiques...), pour un montant défini dans le devis remis par l'association.\nCette somme sera réglée, à réception de la facture, par virement ou par chèque libellé à l'ordre de : l’Association des Secouristes de la Seyne Tamaris Six-Fours.",
+        texteArt9: "En cas de litige pendant et après la manifestation, à défaut d'entente entre l'association prestataire et l'organisateur, le contentieux pourra faire l'objet de recours devant les tribunaux compétents. Les informations recueillies vous concernant font l’objet d’un traitement destiné à l’établissent de documents administratifs et réglementaire (devis, facture, etc…) ainsi que des toutes autres données liées aux interventions. Les destinataires de ces données sont l'Association des Secouristes de la Seyne Tamaris Six-Fours, les secours publics ou privés et la préfecture. La durée de conservation des données est de 20 ans après la fin de l’événement (code de la santé publique : article R1112-7).",
     });
 
     const [isSavingInfos, setIsSavingInfos] = useState(false);
@@ -199,9 +204,9 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
                     <img src="/log_asstsf.png" alt="ASSTSF Logo" className="w-16 h-16 object-contain" />
                     <div>
                         <h2 className="text-lg font-black uppercase leading-tight text-black">ASSOCIATION DES SECOURISTES</h2>
-                        <h3 className="font-bold text-sm uppercase text-black">La Seyne-Tamaris-Six-Fours</h3>
-                        <p className="text-[10px] mt-1 text-gray-700">98 rue Fontaine, Square Émile Malsert, 83500 La Seyne-sur-Mer</p>
-                        <p className="text-[10px] text-gray-700">Identifiant Siret: 401715 107 00033 | R.N.A: W832006454</p>
+                        <h3 className="font-bold text-sm uppercase text-black">De LA SEYNE-TAMARIS-SIX-FOURS</h3>
+                        <p className="text-[10px] mt-1 text-gray-700">Square Émile Malsert, 96 rue La Fontaine, 83500 La Seyne-sur-Mer</p>
+                        <p className="text-[10px] text-gray-700">Identifiant Siret : 401 715 107 00033 | R.N.A : W 832006454</p>
                     </div>
                 </div>
                 <div className="text-right text-[9px] font-medium leading-tight text-gray-700">
@@ -224,29 +229,31 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
 
             <h3 className="font-bold uppercase text-[13px] bg-gray-100 text-black p-1 mb-2">2. Organisateur de l'événement :</h3>
             <p className="mb-4 text-[12px] text-slate-900 leading-relaxed px-1">
-                Raison sociale de l'organisateur : <strong>{infos.organisme}</strong><br />
-                Représenté par : <strong>{infos.contactNom}</strong><br />
+                Ci-après désignée : L’organisateur représenté par : <strong>{infos.contactNom}</strong><br />
                 Téléphone : {infos.contactTel}<br />
                 Adresse mail : {infos.contactEmail}
             </p>
 
             <h3 className="font-bold uppercase text-[13px] bg-gray-100 text-black p-1 mb-2">3. Objet de la convention :</h3>
-            <p className="font-bold underline text-[11px] mb-1 text-black">3.1 Objet</p>
+            <p className="font-bold underline text-[11px] mb-1 text-black">3.1 Objet :</p>
             <textarea rows={3} value={infos.texteArt31} onChange={e => setInfos({ ...infos, texteArt31: e.target.value })} className={inlineTextareaStyle + " mb-2"} />
 
             {typeConvention === 'PUBLIC' ? (
-                <p className="mb-4 font-bold bg-yellow-50 p-2 border border-yellow-200 text-black text-[12px]">La mise en place du Dispositif Prévisionnel de Secours concerne le public (spectateur) de la manifestation.</p>
+                <div className="mb-4 font-bold bg-yellow-50 p-2 border border-yellow-200 text-black text-[12px]">
+                    <textarea rows={2} value={infos.texteArt31Public} onChange={e => setInfos({ ...infos, texteArt31Public: e.target.value })} className={inlineTextareaStyle} />
+                </div>
             ) : (
-                <div className="mb-4 font-bold bg-yellow-50 p-2 border border-yellow-200 text-black text-[12px] space-y-2 text-justify">
-                    <p>La mise en place du Dispositif Prévisionnel de Secours concerne les acteurs de la manifestation (joueurs, compétiteurs, comédiens, ...).</p>
-                    <p>Bien que les dispositions du Référentiel National Dispositifs prévisionnels de Secours soient uniquement prises pour assurer la sécurité du public, il convient à l’organisateur de la manifestation d’apprécier l’opportunité de les appliquer à la sécurité des acteurs, en l’absence de dispositions réglementaires plus contraignantes. En outre, l’organisateur est libre de faire appel, en complément du DPS à personnes prescrit, à tout autre moyen humain ou matériel, destiné à augmenter le niveau de sécurité de la manifestation.</p>
+                <div className="mb-4 font-bold bg-yellow-50 p-2 border border-yellow-200 text-black text-[12px] space-y-1 text-justify">
+                    <textarea rows={2} value={infos.texteArt31Acteur1} onChange={e => setInfos({ ...infos, texteArt31Acteur1: e.target.value })} className={inlineTextareaStyle} />
+                    <textarea rows={6} value={infos.texteArt31Acteur2} onChange={e => setInfos({ ...infos, texteArt31Acteur2: e.target.value })} className={inlineTextareaStyle} />
                 </div>
             )}
 
             <p className="font-bold underline text-[11px] mb-1 text-black">3.2 Descriptif de l'événement :</p>
-            <ul className="mb-4 list-disc ml-6 text-[12px] text-slate-900">
+            <ul className="mb-4 list-none ml-2 text-[12px] text-slate-900">
                 <li>Nom de l'événement : <strong>{infos.eventNom}</strong></li>
-                <li>Date et heures : Du {formatDate(infos.dateDebutInput)} ({infos.heureDebut}) au {formatDate(infos.dateFinInput)} ({infos.heureFin})</li>
+                <li>Date et heures : {formatDate(infos.dateDebutInput)} ({infos.heureDebut}) {infos.dateFinInput && ` au ${formatDate(infos.dateFinInput)}`} {infos.heureFin && `(${infos.heureFin})`}</li>
+                <li>Lieu : {infos.eventLieu}</li>
                 <li>Adresse Précise : <strong>{infos.eventLieu}</strong></li>
             </ul>
 
@@ -296,15 +303,22 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
             <p className="mb-1 text-emerald-700 font-bold text-[11px] px-1">Prise en charge restauration / boissons :</p>
             <textarea rows={2} value={infos.texteRepas} onChange={e => setInfos({ ...infos, texteRepas: e.target.value })} className={inlineTextareaStyle + " mb-2 border-l-2 border-emerald-500 pl-2 font-medium bg-emerald-50/20 text-emerald-950"} />
 
-            <p className="mb-2 text-[12px] text-slate-900"><strong>5.2 Modalités opérationnelles :</strong> Correspondant de l’organisateur : M./Mme {infos.contactNom} Tél : {infos.contactTel}. Le commandement du dispositif sera assuré par l'association prestataire.</p>
+            <p className="mb-2 text-[12px] text-slate-900"><strong>5.2 Modalités financières :</strong> Correspondant de l’organisateur : M./Mme {infos.contactNom} Tél : {infos.contactTel}. Le commandement du dispositif sera assuré par l'association prestataire.</p>
 
             <p className="font-bold underline text-[11px] mb-1 text-black">5.3 Modalités financières :</p>
-            <textarea rows={3} value={infos.texteArt53} onChange={e => setInfos({ ...infos, texteArt53: e.target.value })} className={inlineTextareaStyle + " mb-6"} />
+            <textarea rows={4} value={infos.texteArt53} onChange={e => setInfos({ ...infos, texteArt53: e.target.value })} className={inlineTextareaStyle + " mb-6"} />
 
-            <h3 className="font-bold uppercase text-[13px] bg-gray-100 text-black p-1 mb-2">9. Litiges :</h3>
-            <textarea rows={3} value={infos.texteArt9} onChange={e => setInfos({ ...infos, texteArt9: e.target.value })} className={inlineTextareaStyle + " mb-6"} />
+            <h3 className="font-bold uppercase text-[13px] bg-gray-100 text-black p-1 mb-2">6. Engagement des deux parties :</h3>
+            <p className="text-[11px] mb-2"><strong>6.1 Durée de la convention :</strong> Cette convention est signée pour la durée de l'événement objet de la présente.</p>
+            <p className="text-[11px] mb-4"><strong>6.2 Condition de réalisation :</strong> L'engagement de l'association prestataire est lié à l'acceptation de la présente convention par l'organisateur.</p>
 
-            <div className="mt-8 mb-6 font-bold text-[12px] text-black">Convention établie en double exemplaires à La Seyne Sur Mer, le {new Date().toLocaleDateString('fr-FR')}</div>
+            <h3 className="font-bold uppercase text-[13px] bg-gray-100 text-black p-1 mb-2">7. Clauses particulières :</h3>
+            <p className="text-[11px] mb-4">Néant.</p>
+
+            <h3 className="font-bold uppercase text-[13px] bg-gray-100 text-black p-1 mb-2">8. Litiges :</h3>
+            <textarea rows={5} value={infos.texteArt9} onChange={e => setInfos({ ...infos, texteArt9: e.target.value })} className={inlineTextareaStyle + " mb-6"} />
+
+            <div className="mt-4 mb-4 font-bold text-[12px] text-black">Convention établie à La Seyne Sur Mer, le {new Date().toLocaleDateString('fr-FR')}</div>
 
             <div className="grid grid-cols-2 gap-12 mt-4 pt-4 border-t-2 border-black text-black">
                 <div>
@@ -319,14 +333,12 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
                         </div>
                     ) : (
                         <>
-                            <p className="text-[10px] text-gray-500 italic mb-12">Lu et approuvé (date et signature)</p>
-                            <p className="text-[10px] text-gray-500 italic">(cachet, nom et prénom, fonction du signataire)</p>
+                            <p className="text-[10px] text-gray-500 italic mb-12">(Nom et prénom, fonction, signature, et cachet)</p>
                         </>
                     )}
                 </div>
                 <div className="relative">
-                    <p className="font-bold text-[12px] underline mb-2">Pour l'Association :</p>
-                    <p className="text-[10px] text-gray-900 font-bold mb-1">Sauveur AMICO, Président de l'ASSTSF</p>
+                    <p className="font-bold text-[12px] underline mb-2">Pour l'ASSTSF :</p>
 
                     {inclureSignature && (
                         <div className="relative h-24 mt-2">
@@ -413,7 +425,6 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
                     </Button>
                 </div>
 
-                {/* 🪛 NOUVEAU BLOC : DÉTAILS DE L'ÉVÉNEMENT */}
                 <div className="space-y-4 border-t border-slate-200 dark:border-white/10 pt-4">
                     <div className="flex items-center gap-2 text-blue-600">
                         <CalendarDays size={16} />
