@@ -11,7 +11,12 @@ import Link from "next/link";
 export default function SignInscriptionClient({ inscription }: { inscription: any }) {
     const user = inscription.user;
     const isStructure = inscription.typeDemande === "STRUCTURE";
+
     // États du formulaire
+    // 🪛 NOUVEAU : Découpage du nom complet en Prénom et Nom
+    const [firstName, setFirstName] = useState(user.name?.split(' ')[0] || "");
+    const [lastName, setLastName] = useState(user.name?.split(' ').slice(1).join(' ') || "");
+
     const [birthDate, setBirthDate] = useState(user.birthDate ? new Date(user.birthDate).toISOString().split('T')[0] : "");
     const [birthPlace, setBirthPlace] = useState(user.birthPlace || "");
     const [address, setAddress] = useState(user.address || "");
@@ -20,9 +25,9 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
     const [phone, setPhone] = useState(user.phone || "");
 
     // États de l'application
-    // 🪛 MODIFIÉ : Si c'est une structure, on valide l'étape 1 d'office
+    // 🪛 MODIFIÉ : On vérifie maintenant que le nom et le téléphone sont aussi présents
     const [isProfileComplete, setIsProfileComplete] = useState(
-        isStructure ? true : !!(user.birthDate && user.birthPlace && user.address && user.zipCode && user.city)
+        isStructure ? true : !!(user.name && user.phone && user.birthDate && user.birthPlace && user.address && user.zipCode && user.city)
     );
 
     const [step, setStep] = useState(
@@ -104,6 +109,8 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
         setIsSavingProfile(true);
 
         const res = await updateProfileFFSS(user.id, {
+            firstName,
+            lastName,
             birthDate,
             birthPlace,
             address,
@@ -184,6 +191,19 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
                     </div>
 
                     <form onSubmit={handleSaveProfile} className="space-y-5">
+
+                        {/* 🪛 NOUVEAU : Champs Prénom et Nom */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Prénom</Label>
+                                <Input required value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Ex: Jean" className="bg-slate-50 dark:bg-black/10 h-12 rounded-xl" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nom de famille</Label>
+                                <Input required value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Ex: DUPONT" className="bg-slate-50 dark:bg-black/10 h-12 rounded-xl uppercase" />
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Date de naissance</Label>

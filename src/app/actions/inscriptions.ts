@@ -23,24 +23,28 @@ export async function updateInscriptionStatus(id: string, status: string) {
 export async function updateProfileFFSS(
     userId: string,
     data: {
+        firstName: string; // 🆕 Ajout du prénom
+        lastName: string;  // 🆕 Ajout du nom
         birthDate: string;
         birthPlace: string;
         address: string;
         zipCode: string;
         city: string;
-        phone: string; // 🆕 Ajout du téléphone
+        phone: string;
     }
 ) {
     try {
         await prisma.user.update({
             where: { id: userId },
             data: {
+                // 🪛 On fusionne le prénom et le nom (en majuscules) pour la base de données
+                name: `${data.firstName.trim()} ${data.lastName.trim().toUpperCase()}`,
                 birthDate: data.birthDate ? new Date(data.birthDate) : null,
                 birthPlace: data.birthPlace,
                 address: data.address,
                 zipCode: data.zipCode,
                 city: data.city,
-                phone: data.phone, // 🆕 Mise à jour en base
+                phone: data.phone,
             },
         });
 
@@ -69,15 +73,15 @@ export async function signFormationDevis(
             return { success: false, error: "Dossier d'inscription introuvable." };
         }
 
-        
-        // Vérification stricte du profil FFSS (Uniquement pour les particuliers)
+        // 🪛 CORRECTION : Vérification stricte du profil FFSS incluant Nom/Prénom et Téléphone
         if (inscription.typeDemande !== "STRUCTURE") {
             const { user } = inscription;
-            if (!user.birthDate || !user.birthPlace || !user.address || !user.zipCode || !user.city) {
+
+            if (!user.name || !user.phone || !user.birthDate || !user.birthPlace || !user.address || !user.zipCode || !user.city) {
                 return {
                     success: false,
                     error: "PROFIL_INCOMPLET",
-                    message: "Veuillez compléter vos informations de naissance et d'adresse avant de signer."
+                    message: "Veuillez compléter vos informations personnelles (Nom, prénom, téléphone, naissance et adresse) avant de signer."
                 };
             }
         }
@@ -93,7 +97,6 @@ export async function signFormationDevis(
                     _count: {
                         select: {
                             inscriptions: {
-                                // 🪛 On utilise la même logique ici pour être sûr du compte !
                                 where: {
                                     status: {
                                         in: ["VALIDEE", "VALIDE", "Validée", "Validé", "VALIDÉ", "VALIDÉE"]
