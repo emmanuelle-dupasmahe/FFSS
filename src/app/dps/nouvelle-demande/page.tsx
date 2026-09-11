@@ -378,7 +378,7 @@ export default function NouvelleDemandeDPS() {
                 <Textarea
                   name="description"
                   required
-                  placeholder="Expliquez-nous le déroulement, les risques particuliers..."
+                  placeholder="Décrivez la manifestation. Précisez les jours et horaires particuliers. Indiquez le nom, prénom, tél du contact sur l'événement."
                   className="rounded-2xl border-slate-200 min-h-[120px]"
                 />
               </div>

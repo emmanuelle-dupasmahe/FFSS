@@ -155,7 +155,7 @@ function DevisFormationForm() {
 
     const messagePlaceholder = isStructure
         ? "Indiquez ici les profils des stagiaires, les dates souhaitées pour le groupe ou si vous avez besoin d'une formation dans vos locaux..."
-        : "Précisez votre situation : êtes-vous licencié en club ? Votre PSE1/PSE2 est-il à jour ? Des précisions particulières ?";
+        : "Précisez votre situation : êtes-vous licencié en club de natation ? Votre PSE1/PSE2 est-il à jour de formation continue ? Des précisions particulières ?";
 
     const formationsFiltrees = formations.filter((f: any) => {
         const titleUpper = f.title.toUpperCase();
@@ -371,7 +371,7 @@ function DevisFormationForm() {
                                 <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 flex gap-3 italic">
                                     <HelpCircle className="text-primary shrink-0" size={16} />
                                     <p className="text-[10px] text-slate-500 leading-relaxed italic">
-                                        Nous adaptons le contenu aux besoins de votre structure. Le SSA nécessite des prérequis BNSSA/PSE2 pour les candidats.
+                                        Nous adaptons le contenu aux besoins de votre structure.
                                     </p>
                                 </div>
 
