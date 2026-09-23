@@ -47,7 +47,6 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
         texteArt1: `L'Association des Secouristes de la Seyne Tamaris Six-Fours (ASSTSF), représenté par son président Sauveur AMICO, a reçu notamment une autorisation d’exercice déconcentrée pour les missions de sécurité civile de type D, par sa régulière affiliation à la Fédération Française de Sauvetage et de Secourisme (FFSS), association agréée de sécurité civile au plan national par arrêté ministériel.`,
         texteArt31: "La présente convention a pour but de fixer les modalités de fonctionnement entre : l’organisateur et l’ASSTSF, ceci afin de bien clarifier le cadre juridique de la prestation de service assurée, et ce, conformément aux dispositions du Référentiel National relatif aux Dispositifs Prévisionnels de Secours à personnes, (RNDPS), Ministère de l’intérieur – arrêté NOR : INTE0600910A du 7 novembre 2006.",
 
-        // Nouveaux blocs textes modifiables pour l'Article 3.1
         texteArt31Public: "La mise en place du Dispositif Prévisionnel de Secours (DPS) concerne le public spectateur de la manifestation.",
         texteArt31Acteur1: "La mise en place du Dispositif Prévisionnel de Secours (DPS) concerne les acteurs de la manifestation (joueurs, compétiteurs, comédiens, …)",
         texteArt31Acteur2: "Bien que les dispositions du Référentiel National relatif aux Dispositifs Prévisionnels de Secours à personnes, (RNDPS), Ministère de l’intérieur – arrêté NOR : INTE0600910A du 7 novembre 2006, soient uniquement prises pour assurer la sécurité du public (spectateur), il convient à l’organisateur de la manifestation d’apprécier l’opportunité de les appliquer à la sécurité des acteurs, en l’absence de dispositions réglementaires plus contraignantes. En outre, l’organisateur est libre de faire appel, en complément du DPS, à tout autre moyen humain ou matériel, destiné à augmenter le niveau de sécurité de la manifestation.",
@@ -60,7 +59,10 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
         texteArt432: "Les différents lots de matériels mis à disposition sont conformes au RNDPS du 7 novembre 2006.",
         texteArt44: "1° Reconnaître et analyser la situation accidentelle,\n2° Prendre les premières mesures adaptées de sécurité et de protection,\n3° Faire un bilan et porter les premiers secours nécessaires à une victime,\n4° Prodiguer des conseils adaptés à une victime qui pourrait partir par ses propres moyens,\n5° Contribuer à la mise en place de la chaîne des secours (alerte / secours public),\n6° Accueillir les secours et faciliter leur intervention.",
         texteArt45: "L'association prestataire n'assurera pas le transport des victimes vers un centre hospitalier. Les éventuelles évacuations des blessés ou malades sont assurées par les services publics de secours.",
-        texteArt46: "Les intervenants sont revêtus de leur tenue officielle. Le chef de poste prendra contact avec l’organisateur ou son représentant, dès son arrivée sur site, pour vérifier la concordance avec les clauses techniques de la convention, mettre en place le dispositif et déterminer les modalités opératoires liées à l’événement.",
+
+        // 🪛 MODIFIÉ : Ajout du commandement et du correspondant avec intégration automatique des variables
+        texteArt46: `Les intervenants sont revêtus de leur tenue officielle. Le chef de poste prendra contact avec l’organisateur ou son représentant, dès son arrivée sur site, pour vérifier la concordance avec les clauses techniques de la convention, mettre en place le dispositif et déterminer les modalités opératoires liées à l’événement.\nLe commandement du dispositif sera assuré par l'association prestataire.\n\nCorrespondant de l’organisateur :\nM. / Mme ${demandeDPS.nomContact || demandeDPS.user?.name || ""}\nTél : ${demandeDPS.telephoneContact || ""}`,
+
         texteArt51: "1 tente fermée ou 1 local à disposition des secouristes.\nAppel des secours publics : téléphones portables complétés éventuellement de radios portatives.",
         texteRepas: "Les repas et les boissons des secouristes bénévoles présents seront pris en charge par l’organisateur.",
         texteArt53: "L'intervention des secouristes demeure bénévole et l'action de l'association prestataire est à but non lucratif. Toutefois, l'organisateur dédommage l'association des frais engendrés (déplacements, matériel, oxygène, produits pharmaceutiques...), pour un montant défini dans le devis remis par l'association.\nCette somme sera réglée, à réception de la facture, par virement ou par chèque libellé à l'ordre de : l’Association des Secouristes de la Seyne Tamaris Six-Fours.",
@@ -289,8 +291,9 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
             <p className="font-bold underline text-[11px] mb-1 text-black">4.5 Transport des victimes :</p>
             <textarea rows={2} value={infos.texteArt45} onChange={e => setInfos({ ...infos, texteArt45: e.target.value })} className={inlineTextareaStyle + " mb-4"} />
 
+            {/* 🪛 MODIFIÉ : 4.6 inclut maintenant toutes les mentions */}
             <p className="font-bold underline text-[11px] mb-1 text-black">4.6 Modalités opérationnelles :</p>
-            <textarea rows={3} value={infos.texteArt46} onChange={e => setInfos({ ...infos, texteArt46: e.target.value })} className={inlineTextareaStyle + " mb-2"} />
+            <textarea rows={7} value={infos.texteArt46} onChange={e => setInfos({ ...infos, texteArt46: e.target.value })} className={inlineTextareaStyle + " mb-2"} />
         </>
     );
 
@@ -303,9 +306,8 @@ export default function ConventionGenerator({ demandeDPS, calculRIS }: { demande
             <p className="mb-1 text-emerald-700 font-bold text-[11px] px-1">Prise en charge restauration / boissons :</p>
             <textarea rows={2} value={infos.texteRepas} onChange={e => setInfos({ ...infos, texteRepas: e.target.value })} className={inlineTextareaStyle + " mb-2 border-l-2 border-emerald-500 pl-2 font-medium bg-emerald-50/20 text-emerald-950"} />
 
-            <p className="mb-2 text-[12px] text-slate-900"><strong>5.2 Modalités financières :</strong> Correspondant de l’organisateur : M./Mme {infos.contactNom} Tél : {infos.contactTel}. Le commandement du dispositif sera assuré par l'association prestataire.</p>
-
-            <p className="font-bold underline text-[11px] mb-1 text-black">5.3 Modalités financières :</p>
+            {/* 🪛 MODIFIÉ : Correction de la numérotation */}
+            <p className="font-bold underline text-[11px] mb-1 text-black">5.2 Modalités financières :</p>
             <textarea rows={4} value={infos.texteArt53} onChange={e => setInfos({ ...infos, texteArt53: e.target.value })} className={inlineTextareaStyle + " mb-6"} />
 
             <h3 className="font-bold uppercase text-[13px] bg-gray-100 text-black p-1 mb-2">6. Engagement des deux parties :</h3>
