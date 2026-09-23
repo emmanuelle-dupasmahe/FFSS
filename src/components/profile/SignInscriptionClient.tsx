@@ -13,7 +13,6 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
     const isStructure = inscription.typeDemande === "STRUCTURE";
 
     // États du formulaire
-    // 🪛 NOUVEAU : Découpage du nom complet en Prénom et Nom
     const [firstName, setFirstName] = useState(user.name?.split(' ')[0] || "");
     const [lastName, setLastName] = useState(user.name?.split(' ').slice(1).join(' ') || "");
 
@@ -25,7 +24,6 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
     const [phone, setPhone] = useState(user.phone || "");
 
     // États de l'application
-    // 🪛 MODIFIÉ : On vérifie maintenant que le nom et le téléphone sont aussi présents
     const [isProfileComplete, setIsProfileComplete] = useState(
         isStructure ? true : !!(user.name && user.phone && user.birthDate && user.birthPlace && user.address && user.zipCode && user.city)
     );
@@ -39,6 +37,7 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
     // Canvas pour la signature
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isDrawing, setIsDrawing] = useState(false);
+    const [hasDrawn, setHasDrawn] = useState(false);
 
     // Initialisation du Canvas pour la signature tactile/souris
     useEffect(() => {
@@ -74,6 +73,8 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
+        setHasDrawn(true); // L'utilisateur a commencé à signer
+
         const rect = canvas.getBoundingClientRect();
         let clientX = 0;
         let clientY = 0;
@@ -100,6 +101,7 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
         if (canvas) {
             const ctx = canvas.getContext("2d");
             ctx?.clearRect(0, 0, canvas.width, canvas.height);
+            setHasDrawn(false); // Réinitialisation de l'état si le canvas est effacé
         }
     };
 
@@ -132,17 +134,13 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
     const handleSignDevis = async () => {
         if (!canvasRef.current) return;
 
-        // On convertit le dessin du canvas en image Base64
-        const signatureDataUrl = canvasRef.current.toDataURL("image/png");
-
-        // Petite vérification pour s'assurer que le canvas n'est pas complètement vide
-        const blank = document.createElement('canvas');
-        blank.width = canvasRef.current.width;
-        blank.height = canvasRef.current.height;
-        if (signatureDataUrl === blank.toDataURL("image/png")) {
+        if (!hasDrawn) {
             alert("Veuillez apposer votre signature dans le cadre prévu.");
             return;
         }
+
+        // On convertit le dessin du canvas en image Base64
+        const signatureDataUrl = canvasRef.current.toDataURL("image/png");
 
         setIsSigning(true);
         const res = await signFormationDevis(inscription.id, signatureDataUrl);
@@ -192,7 +190,6 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
 
                     <form onSubmit={handleSaveProfile} className="space-y-5">
 
-                        {/* 🪛 NOUVEAU : Champs Prénom et Nom */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Prénom</Label>
