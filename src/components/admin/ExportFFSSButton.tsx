@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 export default function ExportFFSSButton({ data }: { data: any[] }) {
     const handleExport = () => {
         const headers = ["Nom et Prénom", "Email", "Téléphone", "Date de Naissance", "Lieu de Naissance", "Adresse", "Code Postal", "Ville", "Formation"];
+        // L'astuce sep=; est très bien pour forcer Excel à séparer les colonnes correctement en France
         const csvRows = ["sep=;", headers.join(";")];
 
         // 2. Remplissage et nettoyage
@@ -16,7 +17,7 @@ export default function ExportFFSSButton({ data }: { data: any[] }) {
             const formation = item.formation;
 
             const dateNaissance = user?.birthDate ? new Date(user.birthDate).toLocaleDateString("fr-FR") : "";
-            
+
             const cleanName = (user?.name || "").replace(/[\n\r]/g, " ");
             const cleanAddress = (user?.address || "").replace(/[\n\r]/g, " ");
             const cleanBirthPlace = (user?.birthPlace || "").replace(/[\n\r]/g, " ");
@@ -32,15 +33,18 @@ export default function ExportFFSSButton({ data }: { data: any[] }) {
                 `"${cleanAddress}"`,
                 `"${user?.zipCode || ''}"`,
                 `"${cleanCity}"`,
-                `"${cleanFormation}"` // Ajout de la formation
+                `"${cleanFormation}"` // Ajout de la formation unique
             ];
-            
+
             csvRows.push(values.join(";"));
         });
 
         const csvContent = csvRows.join("\n");
-        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-        
+
+        // 🪛 CORRECTION : Utilisation de l'encodage binaire pur pour le BOM (Infaillible sur Excel Windows et Mac)
+        const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+        const blob = new Blob([bom, csvContent], { type: "text/csv;charset=utf-8;" });
+
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -54,9 +58,9 @@ export default function ExportFFSSButton({ data }: { data: any[] }) {
     if (!data || data.length === 0) return null;
 
     return (
-        <Button 
-            onClick={handleExport} 
-            variant="outline" 
+        <Button
+            onClick={handleExport}
+            variant="outline"
             className="h-10 rounded-xl text-[10px] uppercase font-black px-4 border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 flex items-center gap-2 shadow-sm"
         >
             <Download size={14} /> Exporter Tableur FFSS
