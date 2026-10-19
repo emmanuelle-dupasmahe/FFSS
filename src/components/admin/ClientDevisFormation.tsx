@@ -22,7 +22,7 @@ import { toast } from "sonner";
 
 
 
-export default function ClientDevisFormation({ inscription, templateBody }: any) {
+export default function ClientDevisFormation({ inscription, templateBody, ibanAsso }: any) {
     // --- 1. LOGIQUE AUTOMATIQUE DE PRÉ-REMPLISSAGE ---
     const isStructure = inscription.typeDemande === "STRUCTURE";
     const titre = inscription.formation?.title?.toUpperCase() || "";
@@ -86,7 +86,7 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
 
     // 🪛 AJOUT : Infos bancaires pour le devis
     const factureInfos = {
-        iban: "FR76 3000 3020 8000 0372 7030 983",
+        iban: ibanAsso || "FR76 3000 3020 8000 0372 7030 983",
         note: "Merci d'indiquer le n° du devis et le nom du candidat en libellé du virement."
     };
 

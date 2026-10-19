@@ -22,7 +22,7 @@ import { processAndSendDpsFacture } from "@/app/actions/devis";
 import { toast } from "sonner";
 
 // 🛠️ AJOUT DES DATES (eventDate, endDate) DANS LES PROPS
-export default function ClientFacture({ effectifInitial, eventTitle, eventDate, endDate, location, totalInitial, devisDpsId, devisId, id, userEmail, templateBody, organismeDemandeur, nomContact, telephoneContact }: any) {
+export default function ClientFacture({ effectifInitial, eventTitle, eventDate, endDate, location, totalInitial, devisDpsId, devisId, id, userEmail, templateBody, organismeDemandeur, nomContact, telephoneContact,ibanAsso }: any) {
     const router = useRouter();
 
     // SÉCURITÉ : On cherche l'ID partout où il pourrait être caché
@@ -37,7 +37,7 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
         echeance: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         clientNom: organismeDemandeur || "Structure...",
         clientAdresse: nomContact ? `À l'attention de : ${nomContact}\nAdresse du client...` : "Adresse du client...",
-        iban: "FR76 3000 3020 8000 0372 7030 983",
+        iban: ibanAsso || "FR76 3000 3020 8000 0372 7030 983",
         note: "Exonération de TVA - Article 261-7-1 du CGI"
     });
 

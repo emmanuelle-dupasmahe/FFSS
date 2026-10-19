@@ -17,6 +17,12 @@ export default async function FacturePage({ params }: { params: { id: string } }
         where: { type: "FACTURE" }
     });
 
+    // 🪛 NOUVEAU : Récupération de l'IBAN depuis la table SiteContent
+    const ibanRecord = await prisma.siteContent.findUnique({
+        where: { key: "IBAN_ASSO" }
+    });
+    const ibanAsso = ibanRecord?.value;
+
     // 2. Calcul des constantes de base
     const p2 = devis.p2 || 0.25;
     const e1 = devis.e1 || 0.25;
@@ -54,6 +60,7 @@ export default async function FacturePage({ params }: { params: { id: string } }
             telephoneContact={devis.telephoneContact}
             eventDate={devis.eventDate}
             endDate={devis.endDate}
+            ibanAsso={ibanAsso} // 🪛 Ajout de la prop ici
         />
     );
 }

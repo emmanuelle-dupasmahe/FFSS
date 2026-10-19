@@ -22,12 +22,19 @@ export default async function DevisFormationPage({ params }: { params: { id: str
         where: { type: "FORMATION" }
     });
 
+    // 🪛 NOUVEAU : Récupération de l'IBAN depuis la table SiteContent
+    const ibanRecord = await prisma.siteContent.findUnique({
+        where: { key: "IBAN_ASSO" }
+    });
+    const ibanAsso = ibanRecord?.value;
+
     return (
         // 👈 On enveloppe les deux composants dans une div avec un espacement (space-y-8)
         <div className="space-y-8">
             <ClientDevisFormation
                 inscription={inscription}
                 templateBody={templateFormation?.body}
+                ibanAsso={ibanAsso} // 🪛 Ajout de la prop ici
             />
 
             {/* 🆕 Le panneau financier est ajouté juste en dessous */}
