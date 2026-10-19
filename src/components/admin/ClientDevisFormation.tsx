@@ -86,7 +86,7 @@ export default function ClientDevisFormation({ inscription, templateBody }: any)
 
     // 🪛 AJOUT : Infos bancaires pour le devis
     const factureInfos = {
-        iban: "FR76 3000 4000 0012 3456 7890 123",
+        iban: "FR76 3000 3020 8000 0372 7030 983",
         note: "Merci d'indiquer le n° du devis et le nom du candidat en libellé du virement."
     };
 

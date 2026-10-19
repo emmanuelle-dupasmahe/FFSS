@@ -37,7 +37,7 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
         echeance: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         clientNom: organismeDemandeur || "Structure...",
         clientAdresse: nomContact ? `À l'attention de : ${nomContact}\nAdresse du client...` : "Adresse du client...",
-        iban: "FR76 3000 4000 0012 3456 7890 123",
+        iban: "FR76 3000 3020 8000 0372 7030 983",
         note: "Exonération de TVA - Article 261-7-1 du CGI"
     });
 
