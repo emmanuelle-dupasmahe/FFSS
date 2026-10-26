@@ -15,7 +15,8 @@ import {
     Mail,
     Users,
     Settings,
-    Send
+    Send,
+    ArrowRightLeft
 } from "lucide-react";
 
 export default function NoticeUtilisation() {
@@ -151,6 +152,22 @@ export default function NoticeUtilisation() {
                         <li><strong className="text-slate-900 dark:text-white">Mise en forme :</strong> Rédigez votre message naturellement. Les sauts de ligne que vous tapez dans le formulaire sont conservés et s'afficheront correctement dans l'e-mail reçu.</li>
                         <li><strong className="text-slate-900 dark:text-white">Sécurité :</strong> Une fenêtre de confirmation récapitulative s'affiche systématiquement avant l'expédition pour vous éviter tout envoi accidentel.</li>
                     </ul>
+                </div>
+            )
+        },
+        {
+            id: 11,
+            title: "CORRIGER LA FORMATION D'UN INSCRIT",
+            icon: <ArrowRightLeft className="text-blue-500" size={16} />,
+            content: (
+                <div className="space-y-2 text-slate-600 dark:text-slate-300">
+                    <p>Un stagiaire s'est inscrit à la mauvaise formation (ex : <span className="font-semibold text-slate-800 dark:text-slate-200">Recyclage SSA</span> au lieu de la <span className="font-semibold text-slate-800 dark:text-slate-200">Formation initiale SSA</span>) ? Inutile de supprimer son dossier :</p>
+                    <ol className="list-decimal ml-5 space-y-1 font-medium">
+                        <li>Dans l'onglet <strong className="text-slate-900 dark:text-white">Inscriptions</strong>, ouvrez le dossier du stagiaire.</li>
+                        <li>Dans le bloc <span className="font-bold text-blue-500">Changer de formation</span>, choisissez la bonne formation puis la date de session (ou "Sans date précise").</li>
+                        <li>Cliquez sur <strong className="text-slate-900 dark:text-white">Enregistrer le changement</strong> et confirmez.</li>
+                    </ol>
+                    <p><span className="font-bold text-amber-500">Attention :</span> si un devis avait déjà été envoyé ou signé, il est <span className="font-bold">automatiquement annulé</span> car il concernait l'ancienne formation, et le dossier repasse en attente. Pensez alors à vérifier le prix dans la <strong className="text-slate-900 dark:text-white">Gestion financière</strong> (les paiements déjà enregistrés sont conservés), puis à générer et envoyer un nouveau devis, que le stagiaire signera à nouveau.</p>
                 </div>
             )
         }
