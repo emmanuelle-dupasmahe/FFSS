@@ -1,58 +1,80 @@
 "use client";
 
-import React from "react";
-import { Download } from "lucide-react";
+import React, { useState } from "react";
+import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function ExportFFSSButton({ data }: { data: any[] }) {
-    const handleExport = () => {
-        const headers = ["Nom et Prénom", "Email", "Téléphone", "Date de Naissance", "Lieu de Naissance", "Adresse", "Code Postal", "Ville", "Formation"];
-        // L'astuce sep=; est très bien pour forcer Excel à séparer les colonnes correctement en France
-        const csvRows = ["sep=;", headers.join(";")];
+    const [loading, setLoading] = useState(false);
 
-        // 2. Remplissage et nettoyage
-        data.forEach(item => {
-            // Ici, 'item' contient { user, formation }
-            const user = item.user;
-            const formation = item.formation;
+    const handleExport = async () => {
+        setLoading(true);
+        try {
+            // Import dynamique : la librairie n'est chargée qu'au clic sur le bouton
+            const ExcelJS = (await import("exceljs")).default;
 
-            const dateNaissance = user?.birthDate ? new Date(user.birthDate).toLocaleDateString("fr-FR") : "";
+            const workbook = new ExcelJS.Workbook();
+            const sheet = workbook.addWorksheet("Licences FFSS");
 
-            const cleanName = (user?.name || "").replace(/[\n\r]/g, " ");
-            const cleanAddress = (user?.address || "").replace(/[\n\r]/g, " ");
-            const cleanBirthPlace = (user?.birthPlace || "").replace(/[\n\r]/g, " ");
-            const cleanCity = (user?.city || "").replace(/[\n\r]/g, " ");
-            const cleanFormation = (formation?.title || "Non spécifié").replace(/[\n\r]/g, " ");
-
-            const values = [
-                `"${cleanName}"`,
-                `"${user?.email || ''}"`,
-                `"${user?.phone || ''}"`,
-                `"${dateNaissance}"`,
-                `"${cleanBirthPlace}"`,
-                `"${cleanAddress}"`,
-                `"${user?.zipCode || ''}"`,
-                `"${cleanCity}"`,
-                `"${cleanFormation}"` // Ajout de la formation unique
+            sheet.columns = [
+                { header: "Nom et Prénom", key: "name", width: 30 },
+                { header: "Email", key: "email", width: 32 },
+                { header: "Téléphone", key: "phone", width: 16 },
+                { header: "Date de Naissance", key: "birthDate", width: 18 },
+                { header: "Lieu de Naissance", key: "birthPlace", width: 22 },
+                { header: "Adresse", key: "address", width: 40 },
+                { header: "Code Postal", key: "zipCode", width: 12 },
+                { header: "Ville", key: "city", width: 22 },
+                { header: "Formation", key: "formation", width: 35 },
             ];
 
-            csvRows.push(values.join(";"));
-        });
+            // Remplissage et nettoyage
+            data.forEach(item => {
+                // Ici, 'item' contient { user, formation }
+                const user = item.user;
+                const formation = item.formation;
 
-        const csvContent = csvRows.join("\n");
+                const clean = (value: unknown) => String(value ?? "").replace(/[\n\r]/g, " ");
 
-        // 🪛 CORRECTION : Utilisation de l'encodage binaire pur pour le BOM (Infaillible sur Excel Windows et Mac)
-        const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-        const blob = new Blob([bom, csvContent], { type: "text/csv;charset=utf-8;" });
+                sheet.addRow({
+                    name: clean(user?.name),
+                    email: clean(user?.email),
+                    // Téléphone et code postal en texte pour conserver les 0 en tête
+                    phone: clean(user?.phone),
+                    birthDate: user?.birthDate ? new Date(user.birthDate).toLocaleDateString("fr-FR") : "",
+                    birthPlace: clean(user?.birthPlace),
+                    address: clean(user?.address),
+                    zipCode: clean(user?.zipCode),
+                    city: clean(user?.city),
+                    formation: clean(formation?.title || "Non spécifié"),
+                });
+            });
 
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        const dateExport = new Date().toLocaleDateString("fr-FR").replace(/\//g, '-');
-        link.setAttribute("download", `Export_Licences_FFSS_${dateExport}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+            // En-tête en gras, figé et filtrable
+            sheet.getRow(1).font = { bold: true };
+            sheet.views = [{ state: "frozen", ySplit: 1 }];
+            sheet.autoFilter = { from: "A1", to: "I1" };
+            // Force le format texte sur Téléphone (C) et Code Postal (G)
+            sheet.getColumn("phone").numFmt = "@";
+            sheet.getColumn("zipCode").numFmt = "@";
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            });
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            const dateExport = new Date().toLocaleDateString("fr-FR").replace(/\//g, '-');
+            link.setAttribute("download", `Export_Licences_FFSS_${dateExport}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (!data || data.length === 0) return null;
@@ -60,10 +82,11 @@ export default function ExportFFSSButton({ data }: { data: any[] }) {
     return (
         <Button
             onClick={handleExport}
+            disabled={loading}
             variant="outline"
             className="h-10 rounded-xl text-[10px] uppercase font-black px-4 border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 flex items-center gap-2 shadow-sm"
         >
-            <Download size={14} /> Exporter Tableur FFSS
+            {loading ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />} Exporter Tableur FFSS
         </Button>
     );
 }
