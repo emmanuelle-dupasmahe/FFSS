@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 
 import { sendMail } from "../../../lib/mail"; 
+import { isAdmin } from "@/lib/admin-guard";
 
 export async function GET() {
+  if (!(await isAdmin())) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+  }
+
   // On appelle notre fonction de service
   const result = await sendMail({
     to: "test.asstsf@gmail.com", // On envoie sur ta boîte de test

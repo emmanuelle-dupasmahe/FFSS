@@ -2,8 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/admin-guard";
 
 export async function updateSiteSettings(data: Record<string, string>) {
+    await requireAdmin();
     try {
         for (const [key, value] of Object.entries(data)) {
             await prisma.siteContent.upsert({

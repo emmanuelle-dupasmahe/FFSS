@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/admin-guard";
 
 /**
  * Crée une nouvelle demande d'inscription/devis
@@ -82,6 +83,7 @@ export async function createInscription(formData: FormData) {
  * Met à jour le statut d'une inscription (Admin)
  */
 export async function updateInscriptionStatus(id: string, newStatus: string) {
+    await requireAdmin();
     try {
         await prisma.inscription.update({
             where: { id },
@@ -160,6 +162,7 @@ export async function changeInscriptionFormation(id: string, formationId: string
  * Met à jour les ressources documentaires d'une formation
  */
 export async function updateFormationRessources(formationId: string, ressourcesToSave: any[]) {
+    await requireAdmin();
     try {
         // 1. On supprime toutes les anciennes ressources liées à cette formation
         // C'est la méthode la plus fiable pour gérer les ajouts/modifications/suppressions d'un coup
@@ -195,6 +198,7 @@ export async function updateFormationRessources(formationId: string, ressourcesT
  * Supprime définitivement une inscription (Admin)
  */
 export async function deleteInscription(id: string) {
+    await requireAdmin();
     const session = await auth();
 
     if (!session?.user?.id) {
@@ -220,6 +224,7 @@ export async function deleteInscription(id: string) {
  * Met à jour le message d'alerte personnalisé (ex: Minimum d'inscrits)
  */
 export async function updateFormationAlerte(formationId: string, alerteMessage: string) {
+    await requireAdmin();
     try {
         await prisma.formation.update({
             where: { id: formationId },

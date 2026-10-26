@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { isAdmin } from "@/lib/admin-guard";
 
 // GET : Récupérer les sessions
 export async function GET(req: Request) {
@@ -29,6 +30,10 @@ export async function GET(req: Request) {
 
 // POST : Créer une session avec valeurs par défaut
 export async function POST(req: Request) {
+    if (!(await isAdmin())) {
+        return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+    }
+
     try {
         const body = await req.json();
         const { formationId, startDate, endDate, details, maxParticipants } = body;

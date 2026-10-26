@@ -3,9 +3,11 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/admin-guard";
 
 // 1. Suppression sécurisée (Conservée intacte)
 export async function deleteUser(userId: string) {
+    await requireAdmin();
     const session = await auth();
     
     // Empêcher l'auto-suppression
@@ -30,6 +32,7 @@ export async function deleteUser(userId: string) {
 
 // 2. Changement de rôle dynamique (Remplace toggleAdminRole)
 export async function toggleUserRole(userId: string, roleName: string, assign: boolean) {
+    await requireAdmin();
     const session = await auth();
 
     // Sécurité : empêcher de s'auto-retirer le rôle Admin

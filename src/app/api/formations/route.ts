@@ -1,7 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { isAdmin } from "@/lib/admin-guard";
 
 export async function POST(request: Request) {
+  if (!(await isAdmin())) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+  }
+
   try {
     const body = await request.json();
 

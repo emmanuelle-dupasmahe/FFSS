@@ -1,8 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { isAdmin } from "@/lib/admin-guard";
 
 export async function GET() {
   try {
+    // 🔒 Les inscrits (données personnelles) ne sont envoyés qu'aux administrateurs :
+    // cette route est aussi appelée par les pages publiques /formations
+    const admin = await isAdmin();
+
     const formations = await prisma.formation.findMany({
       // 👇 POUR RÉCUPÉRER LES DOCUMENTS ET LES SESSIONS
       include: {
@@ -12,9 +17,10 @@ export async function GET() {
             startDate: 'asc' // 🟢 Trie les dates 
           }
         },
-        inscriptions: {
+        inscriptions: admin && {
           include: {
-            user: true // Permet de récupérer le nom, l'email et le téléphone
+            // Uniquement le nom, l'email et le téléphone (jamais le mot de passe)
+            user: { select: { name: true, email: true, phone: true } }
           }
         }
       },

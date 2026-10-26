@@ -2,8 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/admin-guard";
 
 export async function updateSystemAlert(content: string, type: string, isActive: boolean) {
+    await requireAdmin();
     try {
         await prisma.systemAlert.upsert({
             where: { id: "main-alert" },

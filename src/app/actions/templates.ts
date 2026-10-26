@@ -2,8 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/admin-guard";
 
 export async function updateEmailTemplate(type: string, subject: string, body: string) {
+    await requireAdmin();
     try {
         await prisma.emailTemplate.upsert({
             where: { type },

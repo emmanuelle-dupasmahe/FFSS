@@ -1,10 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { isAdmin } from "@/lib/admin-guard";
 
 export async function DELETE(
     req: Request,
     { params }: { params: Promise<{ id: string }> } // 1. On déclare params comme une Promise
 ) {
+    if (!(await isAdmin())) {
+        return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+    }
+
     try {
         const resolvedParams = await params; // 2. On "attend" que les paramètres soient prêts
         const id = resolvedParams.id;
@@ -30,6 +35,10 @@ export async function PATCH(
     req: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    if (!(await isAdmin())) {
+        return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+    }
+
     try {
         const resolvedParams = await params;
         const id = resolvedParams.id;

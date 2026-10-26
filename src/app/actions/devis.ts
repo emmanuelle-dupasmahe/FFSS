@@ -4,6 +4,7 @@ import { sendMail } from "@/lib/mail";
 import { generateDevisPdf } from "@/lib/pdf-generator";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/admin-guard";
 
 // ============================================================================
 // 1. FORMATIONS : ENVOI DU DEVIS
@@ -15,6 +16,7 @@ export async function processAndSendFormationDevis(
     pdfBase64: string,
     prixTotal: number
 ) {
+    await requireAdmin();
     try {
         const inscription = await prisma.inscription.findUnique({
             where: { id: inscriptionId },
@@ -65,6 +67,7 @@ export async function processAndSendDpsRis(
     customMessage: string,
     pdfBase64: string
 ) {
+    await requireAdmin();
     try {
         const devisDps = await prisma.devisDPS.findUnique({
             where: { id: devisDpsId },
@@ -108,6 +111,7 @@ export async function processAndSendDpsChiffrage({
     customMessage: string;
     pdfBase64: string;
 }) {
+    await requireAdmin();
     try {
         const devisDps = await prisma.devisDPS.findUnique({
             where: { id: devisDpsId },
@@ -160,6 +164,7 @@ export async function processAndSendDpsFacture({
     customMessage: string;
     pdfBase64: string;
 }) {
+    await requireAdmin();
     try {
         const devisDps = await prisma.devisDPS.findUnique({
             where: { id: devisDpsId },
@@ -195,6 +200,7 @@ export async function processAndSendDpsFacture({
 // ============================================================================
 
 export async function processAndSendDpsRisAndConv(formData: FormData) {
+    await requireAdmin();
     try {
         // Déballage sécurisé des données
         const devisDpsId = formData.get("devisId") as string;
@@ -253,6 +259,7 @@ export async function processAndSendDpsRisAndConv(formData: FormData) {
 // ============================================================================
 
 export async function updateDpsLogistics(id: string, data: { expectedPublic: number, superficie: string, distanceMaxi: string }) {
+    await requireAdmin();
     try {
         await prisma.devisDPS.update({
             where: { id },
@@ -275,6 +282,7 @@ export async function updateDpsLogistics(id: string, data: { expectedPublic: num
 // 7. DPS : CHOIX DU TYPE DE CONVENTION (PUBLIC / ACTEUR)
 // ============================================================================
 export async function updateTypeConvention(id: string, type: 'PUBLIC' | 'ACTEUR') {
+    await requireAdmin();
     try {
         await prisma.devisDPS.update({
             where: { id },
@@ -294,6 +302,7 @@ export async function updateDevisContactInfo(
     id: string,
     data: { organisme: string, contactNom: string, contactTel: string, contactEmail: string }
 ) {
+    await requireAdmin();
     try {
         await prisma.devisDPS.update({
             where: { id },
@@ -318,6 +327,7 @@ export async function updateDevisEventInfo(
     id: string,
     data: { eventNom: string, eventLieu: string, dateDebut: Date, dateFin: Date | null, heureDebut: string, heureFin: string }
 ) {
+    await requireAdmin();
     try {
         await prisma.devisDPS.update({
             where: { id },

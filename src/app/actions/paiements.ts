@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/admin-guard";
 
 export async function ajouterPaiement(data: {
     inscriptionId: string;
@@ -11,6 +12,7 @@ export async function ajouterPaiement(data: {
     numCheque?: string;
     note?: string;
 }) {
+    await requireAdmin();
     try {
         await prisma.paiement.create({
             data: {
@@ -34,6 +36,7 @@ export async function ajouterPaiement(data: {
     }
 }
 export async function setPrixTotal(inscriptionId: string, prixTotal: number) {
+    await requireAdmin();
     try {
         await prisma.inscription.update({
             where: { id: inscriptionId },

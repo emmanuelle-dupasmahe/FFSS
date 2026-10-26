@@ -2,8 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { sendMail } from "@/lib/mail";
+import { requireAdmin } from "@/lib/admin-guard";
 
 export async function envoyerMailCible(formationId: string, subject: string, htmlContent: string) {
+    await requireAdmin();
     try {
         // 1. Récupérer les e-mails des stagiaires dont l'inscription est VALIDEE
         const inscriptions = await prisma.inscription.findMany({

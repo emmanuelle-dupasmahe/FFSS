@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/admin-guard";
 
 const RIS_MAPPING: Record<string, number> = {
   "Calme": 0.25, "Peu dynamique": 0.30, "Dynamique": 0.35, "Très dynamique": 0.40,
@@ -87,6 +88,7 @@ export async function createDevisDPS(formData: FormData) {
 }
 
 export async function updateDevisIndicators(id: string, data: Partial<{ p2: number, e1: number, e2: number }>) {
+  await requireAdmin();
   await prisma.devisDPS.update({
     where: { id },
     data: data,
@@ -95,6 +97,7 @@ export async function updateDevisIndicators(id: string, data: Partial<{ p2: numb
 }
 
 export async function deleteDevisDPS(id: string) {
+  await requireAdmin();
   const session = await auth();
 
   if (!session?.user?.id) {

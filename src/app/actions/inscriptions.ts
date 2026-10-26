@@ -2,9 +2,12 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/admin-guard";
+import { auth } from "@/auth";
 
 // --- 1. Mise à jour du statut ---
 export async function updateInscriptionStatus(id: string, status: string) {
+    await requireAdmin();
     try {
         await prisma.inscription.update({
             where: { id },
@@ -33,6 +36,12 @@ export async function updateProfileFFSS(
         phone: string;
     }
 ) {
+    // Sécurité : on ne peut modifier que son propre profil (sauf admin)
+    const session = await auth();
+    if (!session?.user?.id || (session.user.id !== userId && session.user.role !== "ADMIN")) {
+        return { success: false, error: "Accès refusé." };
+    }
+
     try {
         await prisma.user.update({
             where: { id: userId },
@@ -69,7 +78,9 @@ export async function signFormationDevis(
             include: { user: true },
         });
 
-        if (!inscription) {
+        // Sécurité : seul le titulaire du dossier peut signer son devis
+        const session = await auth();
+        if (!inscription || inscription.userId !== session?.user?.id) {
             return { success: false, error: "Dossier d'inscription introuvable." };
         }
 
