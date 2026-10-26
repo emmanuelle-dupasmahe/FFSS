@@ -18,6 +18,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { updateInscriptionStatus } from "@/app/actions/formations";
 import FinancePanel from "@/components/admin/FinancePanel";
+import ChangeFormationPanel from "@/components/admin/ChangeFormationPanel";
 
 export default async function InscriptionDetailPage({
     params
@@ -41,6 +42,20 @@ export default async function InscriptionDetailPage({
     });
 
     if (!ins) return notFound();
+
+    // 3. Liste des formations et de leurs dates (pour corriger une erreur d'inscription)
+    const formations = await prisma.formation.findMany({
+        select: {
+            id: true,
+            title: true,
+            isActive: true,
+            sessions: {
+                select: { id: true, startDate: true, endDate: true },
+                orderBy: { startDate: "asc" }
+            }
+        },
+        orderBy: { title: "asc" }
+    });
 
     return (
         <div className="space-y-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -139,6 +154,9 @@ export default async function InscriptionDetailPage({
                             <PrerequisRow label="PSE 2" active={ins.hasPSE2} />
                         </div>
                     </section>
+
+                    {/* 🆕 CORRECTION DE LA FORMATION (ex : recyclage au lieu de la formation initiale) */}
+                    <ChangeFormationPanel inscription={ins} formations={formations} />
 
                     {/* 🆕 GESTION FINANCIÈRE INTÉGRÉE */}
                     <FinancePanel inscription={ins} />

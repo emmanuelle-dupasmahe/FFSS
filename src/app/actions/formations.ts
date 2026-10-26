@@ -101,6 +101,62 @@ export async function updateInscriptionStatus(id: string, newStatus: string) {
 }
 
 /**
+ * Change la formation (et la session) d'une inscription (Admin)
+ * Ex : un stagiaire inscrit par erreur au recyclage au lieu de la formation initiale
+ */
+export async function changeInscriptionFormation(id: string, formationId: string, sessionId: string | null) {
+    const session = await auth();
+
+    if (session?.user?.role !== "ADMIN") {
+        return { error: "Action réservée aux administrateurs." };
+    }
+
+    try {
+        const inscription = await prisma.inscription.findUnique({ where: { id } });
+        if (!inscription) return { error: "Dossier d'inscription introuvable." };
+
+        const formation = await prisma.formation.findUnique({ where: { id: formationId } });
+        if (!formation) return { error: "Formation introuvable." };
+
+        // La session choisie doit appartenir à la nouvelle formation
+        if (sessionId) {
+            const sessionFormation = await prisma.session.findUnique({ where: { id: sessionId } });
+            if (!sessionFormation || sessionFormation.formationId !== formationId) {
+                return { error: "La date choisie ne correspond pas à cette formation." };
+            }
+        }
+
+        // Le devis déjà envoyé concernait l'ancienne formation : on l'annule pour en refaire un
+        const devisAnnule = !!inscription.devisUrl || inscription.isDevisSigned;
+
+        await prisma.inscription.update({
+            where: { id },
+            data: {
+                formationId,
+                sessionId,
+                ...(devisAnnule && {
+                    devisUrl: null,
+                    isDevisSigned: false,
+                    devisSignedAt: null,
+                    devisSignatureImg: null,
+                    status: "EN_ATTENTE",
+                }),
+            },
+        });
+
+        revalidatePath("/admin/inscriptions");
+        revalidatePath(`/admin/inscriptions/${id}`);
+        revalidatePath("/admin");
+        revalidatePath("/espace-stagiaire");
+
+        return { success: true, devisAnnule };
+    } catch (error) {
+        console.error("ERREUR CHANGEMENT FORMATION:", error);
+        return { error: "Erreur lors du changement de formation." };
+    }
+}
+
+/**
  * Met à jour les ressources documentaires d'une formation
  */
 export async function updateFormationRessources(formationId: string, ressourcesToSave: any[]) {
