@@ -29,13 +29,15 @@ export default async function TopAlertBanner() {
             <style dangerouslySetInnerHTML={{
                 __html: `
                 html { --banner-height: 44px; }
+                /* ⚠️ Pas de transform: scale ici : le bandeau fait toute la largeur,
+                   l'agrandir le fait déborder et fait clignoter les barres de défilement */
                 @keyframes pulse-subtle {
-                    0%, 100% { opacity: 1; transform: scale(1); }
-                    50% { opacity: 0.85; transform: scale(1.005); }
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.85; }
                 }
                 @keyframes pulse-warning {
-                    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(253, 224, 71, 0.8); }
-                    50% { opacity: 0.95; transform: scale(1.008); box-shadow: 0 0 15px 6px rgba(253, 224, 71, 0); }
+                    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(253, 224, 71, 0.8); }
+                    50% { opacity: 0.95; box-shadow: 0 0 15px 6px rgba(253, 224, 71, 0); }
                 }
                 .animate-pulse-subtle {
                     animation: pulse-subtle 3s infinite ease-in-out;
