@@ -111,6 +111,12 @@ export default async function Footer() {
             <div className="mt-12 pt-6 border-t border-slate-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-3">
                 <p className="text-[9px] text-slate-400 uppercase tracking-widest">
                     © {new Date().getFullYear()} ASSTSF
+                    <span className="mx-2 opacity-50">•</span>
+                    {/* Lien de crédit (sans nofollow pour le référencement de ma-nux.fr) */}
+                    Site réalisé par{" "}
+                    <a href="https://ma-nux.fr" target="_blank" rel="noopener" className="font-bold hover:text-primary transition-colors">
+                        Ma-nux
+                    </a>
                 </p>
                 <div className="flex gap-5 text-[9px] text-slate-400 uppercase tracking-widest">
                     <Link href="/mentions-legales" className="hover:text-primary transition-colors">Mentions Légales</Link>
