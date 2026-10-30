@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ShieldCheck, ArrowLeft, Banknote, Info, FileText, Building2, User, Phone, Mail, Box, Calendar, Clock, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, ArrowLeft, Banknote, Info, FileText, Building2, User, Phone, Mail, Box, Calendar, Clock, CheckCircle2, MessageSquare } from "lucide-react";
 import PrintButton from "@/components/admin/PrintButton";
 import IndicatorTable from "@/components/admin/IndicatorTable";
 import SendEmailButton from "@/components/admin/SendEmailButton";
@@ -69,6 +69,21 @@ export default async function DetailDevisPage({ params }: { params: { id: string
     if (val === "Intermédiaire") return "Structure non permanente, espaces naturel -2ha avec peu de pente";
     if (val === "Difficile") return "Espace naturel -5ha avec de la pente";
     if (val === "Complexe") return "Espace naturel accidenté + de 5ha, progression des secours rendue difficile par le public";
+    return val || "Non renseigné";
+  };
+
+  const getLabelTypeEvenement = (val: string | null) => {
+    if (val === "SPORT") return "Sportif";
+    if (val === "CULTURE") return "Culturel / Concert";
+    if (val === "RECU") return "Réunion / Congrès";
+    if (val === "FETE") return "Fête de village / Kermesse";
+    return val || "Non renseigné";
+  };
+
+  const getLabelConfiguration = (val: string | null) => {
+    if (val === "PLEIN_AIR") return "En plein air (Ouvert)";
+    if (val === "ETABLISSEMENT") return "Établissement clos";
+    if (val === "MIXTE") return "Mixte (Intérieur & Extérieur)";
     return val || "Non renseigné";
   };
 
@@ -185,6 +200,27 @@ export default async function DetailDevisPage({ params }: { params: { id: string
 
             </div>
           </div>
+        </div>
+
+        {/* DESCRIPTION / COMMENTAIRE SAISI PAR L'ORGANISATEUR */}
+        <div className="bg-white dark:bg-white/5 p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 pb-6 border-b border-slate-100 dark:border-white/10">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Type d'événement</p>
+              <p className="font-medium text-slate-900 dark:text-white">{getLabelTypeEvenement(devis.typeEvenement)}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Configuration du lieu</p>
+              <p className="font-medium text-slate-900 dark:text-white">{getLabelConfiguration(devis.configurationLieu)}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 mb-3">
+            <MessageSquare size={16} className="text-blue-600" />
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description de l'événement par l'organisateur</p>
+          </div>
+          <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-wrap break-words">
+            {devis.description || "Aucune description renseignée."}
+          </p>
         </div>
 
         {/* CARACTÉRISTIQUES DU SITE ÉCRAN (ÉDITABLE) */}

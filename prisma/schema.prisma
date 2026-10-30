@@ -145,6 +145,8 @@ model DevisDPS {
   
   // Infos Événement
   eventTitle      String
+  typeEvenement   String?  // SPORT, CULTURE, RECU, FETE
+  configurationLieu String? // PLEIN_AIR, ETABLISSEMENT, MIXTE
   eventDate       DateTime
   endDate         DateTime?
   startTime       String?

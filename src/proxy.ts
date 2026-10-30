@@ -5,6 +5,13 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const { nextUrl } = req;
 
+  // 🔒 Espace admin : contrôle côté serveur, avant que la page ne prépare ses données
+  if (nextUrl.pathname === "/admin" || nextUrl.pathname.startsWith("/admin/")) {
+    if (!isLoggedIn) return NextResponse.redirect(new URL("/login", nextUrl));
+    if (req.auth?.user?.role !== "ADMIN") return NextResponse.redirect(new URL("/profile", nextUrl));
+    return NextResponse.next();
+  }
+
   // Définition des routes publiques qui ne nécessitent pas de connexion
   const publicRoutes = ["/", "/login", "/register", "/formations", "/confidentialite"];
 

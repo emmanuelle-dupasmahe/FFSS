@@ -20,6 +20,8 @@ export async function createDevisDPS(formData: FormData) {
 
   // Extraction des données avec vérification
   const title = formData.get("title") as string;
+  const typeEvenement = formData.get("type") as string;
+  const configurationLieu = formData.get("config") as string;
   const dateDebut = formData.get("dateDebut") as string;
   const heureDebut = formData.get("heureDebut") as string;
   const dateFin = formData.get("dateFin") as string;
@@ -57,6 +59,8 @@ export async function createDevisDPS(formData: FormData) {
 
         // Infos Événement
         eventTitle: title,
+        typeEvenement: typeEvenement || null,
+        configurationLieu: configurationLieu || null,
         eventDate: new Date(dateDebut),
         endDate: dateFin ? new Date(dateFin) : null,
         startTime: heureDebut,
