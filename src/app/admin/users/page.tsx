@@ -18,9 +18,9 @@ import { UserActions } from "@/components/admin/UserActions";
 export default async function UsersAdminPage({
   searchParams,
 }: {
-  searchParams: { q?: string };
+  searchParams: Promise<{ q?: string }>;
 }) {
-  const query = searchParams.q || "";
+  const query = (await searchParams).q || "";
 
   // 1. Récupération des utilisateurs avec filtre
   const users = await prisma.user.findMany({
