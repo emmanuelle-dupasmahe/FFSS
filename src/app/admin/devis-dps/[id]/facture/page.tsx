@@ -61,6 +61,9 @@ export default async function FacturePage({ params }: { params: { id: string } }
             eventDate={devis.eventDate}
             endDate={devis.endDate}
             ibanAsso={ibanAsso} // 🪛 Ajout de la prop ici
+            factureNumero={devis.factureNumero}
+            factureDate={devis.factureDate}
+            factureUrl={devis.factureUrl}
         />
     );
 }

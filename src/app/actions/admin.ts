@@ -12,7 +12,7 @@ export async function deleteUser(userId: string) {
     
     // Empêcher l'auto-suppression
     if (session?.user?.id === userId) {
-        throw new Error("Action impossible : vous ne pouvez pas supprimer votre propre compte.");
+        return { error: "Action impossible : vous ne pouvez pas supprimer votre propre compte." };
     }
 
     // Vérifier si l'utilisateur à supprimer est un Admin (sécurité supplémentaire)
@@ -23,11 +23,19 @@ export async function deleteUser(userId: string) {
 
     const isAdmin = userToDelete?.userRoles.some(ur => ur.role.name === "ADMIN");
     if (isAdmin) {
-        throw new Error("Action impossible : un administrateur ne peut pas être supprimé via cette interface.");
+        return { error: "Action impossible : un administrateur ne peut pas être supprimé via cette interface." };
+    }
+
+    // Supprimer le compte supprimerait aussi ses dossiers : on conserve ceux qui sont facturés
+    const inscriptionsFacturees = await prisma.inscription.count({ where: { userId, factureNumero: { not: null } } });
+    const dpsFactures = await prisma.devisDPS.count({ where: { userId, factureNumero: { not: null } } });
+    if (inscriptionsFacturees + dpsFactures > 0) {
+        return { error: "Action impossible : ce compte a des factures, il ne peut pas être supprimé." };
     }
 
     await prisma.user.delete({ where: { id: userId } });
     revalidatePath("/admin/users");
+    return { success: true };
 }
 
 // 2. Changement de rôle dynamique (Remplace toggleAdminRole)

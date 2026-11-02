@@ -157,6 +157,11 @@ model DevisDPS {
   // 🆕 Montant financier
   totalMontant    Float?
 
+  // Facture du DPS (numéro définitif + PDF archivé)
+  factureNumero   String?   @unique
+  factureDate     DateTime?
+  factureUrl      String?   @db.Text
+
   //Type de convention (PUBLIC ou ACTEUR)
   typeConvention  String   @default("PUBLIC")
   
@@ -238,10 +243,11 @@ model Inscription {
   formationsIncluses  Inscription[] @relation("ForfaitBundle")
 }
 
-// Compteur annuel : garantit une numérotation continue des factures de formation
+// Compteurs annuels : garantissent une numérotation continue des factures
 model FactureCompteur {
-  annee   Int @id
-  dernier Int @default(0)
+  annee      Int @id
+  dernier    Int @default(0) // Formations (F-FORM-...)
+  dernierDps Int @default(0) // DPS (F-DPS-...)
 }
 
 model Paiement {

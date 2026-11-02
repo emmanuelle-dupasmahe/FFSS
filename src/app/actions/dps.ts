@@ -109,6 +109,12 @@ export async function deleteDevisDPS(id: string) {
   }
 
   try {
+    // Une facture émise doit rester conservée avec son dossier
+    const devis = await prisma.devisDPS.findUnique({ where: { id } });
+    if (devis?.factureNumero) {
+      return { error: "Cette demande a un numéro de facture : elle ne peut pas être supprimée." };
+    }
+
     await prisma.devisDPS.delete({
       where: { id },
     });

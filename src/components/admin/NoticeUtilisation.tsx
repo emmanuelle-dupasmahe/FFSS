@@ -63,7 +63,7 @@ export default function NoticeUtilisation() {
             icon: <Receipt className="text-purple-500" size={16} />,
             content: (
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                    Inutile de ressaisir les montants après l'événement. Le module de facturation récupère automatiquement le <span className="font-bold text-purple-500">Total Montant exact</span> validé sur le devis (incluant les éventuelles remises accordées). Vous pouvez ajouter de nouvelles lignes de prestations de dernière minute si nécessaire avant l'envoi officiel.
+                    Inutile de ressaisir les montants après l'événement. Le module de facturation récupère automatiquement le <span className="font-bold text-purple-500">Total Montant exact</span> validé sur le devis (incluant les éventuelles remises accordées). Vous pouvez ajouter de nouvelles lignes de prestations de dernière minute si nécessaire avant l'envoi officiel. Le numéro de facture se suit automatiquement et devient <span className="font-bold text-purple-500">définitif</span> dès la première impression ou le premier envoi. Le PDF envoyé reste téléchargeable depuis la page de la facture, et une demande facturée ne peut plus être supprimée.
                 </p>
             )
         },

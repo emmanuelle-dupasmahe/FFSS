@@ -92,7 +92,8 @@ export default function AdminFormationsPage() {
         setSelectedId(null); // On réinitialise la sélection
         fetchFormations();
       } else {
-        toast.error("Erreur lors de la suppression");
+        const data = await res.json().catch(() => null);
+        toast.error(data?.error || "Erreur lors de la suppression");
       }
     } catch (err) {
       toast.error("Erreur réseau");

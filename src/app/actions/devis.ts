@@ -246,14 +246,45 @@ export async function processAndSendDpsChiffrage({
 // 4. DPS (Étape 3) : ENVOI DE LA FACTURE
 // ============================================================================
 
+// Attribue le numéro définitif de la facture (une seule fois par demande)
+export async function reserveDpsFactureNumero(devisDpsId: string) {
+    await requireAdmin();
+    try {
+        const devisDps = await prisma.devisDPS.findUnique({ where: { id: devisDpsId } });
+        if (!devisDps) return { success: false, error: "Demande introuvable." };
+        if (devisDps.factureNumero) return { success: true, numero: devisDps.factureNumero };
+
+        const annee = new Date().getFullYear();
+        const numero = await prisma.$transaction(async (tx) => {
+            const compteur = await tx.factureCompteur.upsert({
+                where: { annee },
+                update: { dernierDps: { increment: 1 } },
+                create: { annee, dernierDps: 1 },
+            });
+            const nouveauNumero = `F-DPS-${annee}-${String(compteur.dernierDps).padStart(4, "0")}`;
+            await tx.devisDPS.update({
+                where: { id: devisDpsId },
+                data: { factureNumero: nouveauNumero },
+            });
+            return nouveauNumero;
+        });
+
+        revalidatePath(`/admin/devis-dps/${devisDpsId}`);
+        return { success: true, numero };
+    } catch (error: any) {
+        console.error("Erreur numérotation facture DPS :", error);
+        return { success: false, error: "Impossible d'attribuer un numéro de facture." };
+    }
+}
+
 export async function processAndSendDpsFacture({
     devisDpsId,
-    total,
+    dateFacture,
     customMessage,
     pdfBase64
 }: {
     devisDpsId: string;
-    total: number;
+    dateFacture: string;
     customMessage: string;
     pdfBase64: string;
 }) {
@@ -266,13 +297,14 @@ export async function processAndSendDpsFacture({
 
         if (!devisDps) return { success: false, error: "Demande introuvable." };
 
-        const numero = `FACT-${devisDps.id.substring(0, 5).toUpperCase()}`;
+        const numero = devisDps.factureNumero;
+        if (!numero) return { success: false, error: "Numéro de facture manquant." };
 
         // Nettoyage et conversion de la photo en PDF
         const base64Data = pdfBase64.split("base64,")[1];
         const pdfBuffer = Buffer.from(base64Data, "base64");
 
-        return await sendMail({
+        const result = await sendMail({
             to: devisDps.user.email,
             subject: `🧾 Facture ASSTSF n° ${numero} - ${devisDps.eventTitle}`,
             html: `
@@ -282,6 +314,17 @@ export async function processAndSendDpsFacture({
             `,
             attachments: [{ filename: `${numero}.pdf`, content: pdfBuffer, contentType: "application/pdf" }],
         });
+
+        if (!result.success) return { success: false, error: "L'e-mail n'a pas pu être envoyé." };
+
+        // On archive le PDF uniquement si l'e-mail est bien parti
+        await prisma.devisDPS.update({
+            where: { id: devisDpsId },
+            data: { factureDate: new Date(dateFacture), factureUrl: pdfBase64 },
+        });
+        revalidatePath(`/admin/devis-dps/${devisDpsId}/facture`);
+
+        return { success: true };
     } catch (error: any) {
         console.error(error);
         return { success: false, error: error.message };

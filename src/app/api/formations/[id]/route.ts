@@ -71,6 +71,17 @@ export async function DELETE(
     try {
         const { id } = await params;
 
+        // Une facture émise doit rester conservée avec son dossier
+        const inscriptionsFacturees = await prisma.inscription.count({
+            where: { formationId: id, factureNumero: { not: null } }
+        });
+        if (inscriptionsFacturees > 0) {
+            return NextResponse.json(
+                { error: "Cette formation a des inscriptions facturées : elle ne peut pas être supprimée." },
+                { status: 409 }
+            );
+        }
+
         // Utiliser une transaction pour s'assurer que toutes les opérations réussissent ou échouent ensemble
         const deleteTransactions = await prisma.$transaction([
             // 1. Supprimer les paiements liés aux inscriptions de cette formation

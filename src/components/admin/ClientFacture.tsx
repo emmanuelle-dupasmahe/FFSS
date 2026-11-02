@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from 'react';
+import { flushSync } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Printer, FileText, Landmark, User, Plus, Trash2, ArrowLeft, Mail, Loader2 } from "lucide-react";
+import { Printer, FileText, Landmark, User, Plus, Trash2, ArrowLeft, Mail, Loader2, Download } from "lucide-react";
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from "jspdf";
 import {
@@ -18,22 +19,21 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { processAndSendDpsFacture } from "@/app/actions/devis";
+import { processAndSendDpsFacture, reserveDpsFactureNumero } from "@/app/actions/devis";
 import { toast } from "sonner";
 
 // 🛠️ AJOUT DES DATES (eventDate, endDate) DANS LES PROPS
-export default function ClientFacture({ effectifInitial, eventTitle, eventDate, endDate, location, totalInitial, devisDpsId, devisId, id, userEmail, templateBody, organismeDemandeur, nomContact, telephoneContact,ibanAsso }: any) {
+export default function ClientFacture({ effectifInitial, eventTitle, eventDate, endDate, location, totalInitial, devisDpsId, devisId, id, userEmail, templateBody, organismeDemandeur, nomContact, telephoneContact,ibanAsso, factureNumero, factureDate, factureUrl }: any) {
     const router = useRouter();
 
     // SÉCURITÉ : On cherche l'ID partout où il pourrait être caché
     const finalId = devisDpsId || devisId || id || effectifInitial?.devisId || effectifInitial?.id || "";
 
-    const [numFacture] = useState(`F-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
+    const [numero, setNumero] = useState<string>(factureNumero || "");
 
     // 💡 PRÉ-REMPLISSAGE INTELLIGENT DU CLIENT
     const [factureInfos, setFactureInfos] = useState({
-        numero: numFacture,
-        date: new Date().toISOString().split('T')[0],
+        date: (factureDate ? new Date(factureDate) : new Date()).toISOString().split('T')[0],
         echeance: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         clientNom: organismeDemandeur || "Structure...",
         clientAdresse: nomContact ? `À l'attention de : ${nomContact}\nAdresse du client...` : "Adresse du client...",
@@ -56,11 +56,32 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
     // --- GESTION MODALE & ENVOI ---
     const [isModalOpen, setIsModalOpen] = useState(false);
     const texteParDefaut = templateBody
-        ? templateBody.replace(/{{eventTitle}}/g, eventTitle || "").replace(/{{numero}}/g, numFacture)
-        : `Bonjour,\n\nVeuillez trouver ci-joint la facture définitive n°${numFacture} concernant les prestations de secours effectuées lors de votre événement "${eventTitle}".\n\nNous vous remercions de votre confiance.`;
+        ? templateBody.replace(/{{eventTitle}}/g, eventTitle || "")
+        : `Bonjour,\n\nVeuillez trouver ci-joint la facture définitive n°{{numero}} concernant les prestations de secours effectuées lors de votre événement "${eventTitle}".\n\nNous vous remercions de votre confiance.`;
 
     const [emailBody, setEmailBody] = useState(texteParDefaut);
     const [isSending, setIsSending] = useState(false);
+
+    // Le numéro n'est attribué qu'au dernier moment, pour ne pas créer de trou dans la numérotation
+    const obtenirNumero = async () => {
+        if (numero) return numero;
+        const result = await reserveDpsFactureNumero(finalId);
+        if (!result.success || !result.numero) throw new Error(result.error || "Numéro indisponible");
+        const nouveauNumero = result.numero;
+        // Le numéro doit être affiché sur la feuille avant de la capturer ou de l'imprimer
+        flushSync(() => setNumero(nouveauNumero));
+        return nouveauNumero;
+    };
+
+    const handlePrint = async () => {
+        try {
+            await obtenirNumero();
+            window.print();
+        } catch (error) {
+            console.error(error);
+            toast.error("Impossible d'attribuer un numéro de facture.");
+        }
+    };
 
     const handleConfirmSend = async () => {
         setIsSending(true);
@@ -73,6 +94,8 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
         }
 
         try {
+            const numeroFacture = await obtenirNumero();
+
             const element = document.getElementById("zone-pdf-officiel");
             if (!element) throw new Error("Feuille officielle introuvable");
 
@@ -107,8 +130,8 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
             // Appel à l'action serveur mise à jour
             const result = await processAndSendDpsFacture({
                 devisDpsId: finalId,
-                total: totalFinal,
-                customMessage: emailBody,
+                dateFacture: factureInfos.date,
+                customMessage: emailBody.replace(/{{numero}}/g, numeroFacture),
                 pdfBase64: pdfBase64
             });
 
@@ -142,6 +165,21 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
                         <FileText className="text-blue-600" /> Console Édition Facture
                     </h2>
 
+                    {factureUrl && (
+                        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-3">
+                            <p className="text-xs text-amber-700 dark:text-amber-400">
+                                La facture {numero} a déjà été envoyée le {new Date(factureDate).toLocaleDateString('fr-FR')}. Un nouvel envoi conservera ce numéro et remplacera le PDF archivé. Une facture émise ne doit normalement plus être modifiée.
+                            </p>
+                            <a
+                                href={factureUrl}
+                                download={`${numero}.pdf`}
+                                className="inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:underline"
+                            >
+                                <Download size={14} /> Télécharger le PDF envoyé
+                            </a>
+                        </div>
+                    )}
+
                     {/* LA FAMEUSE MODALE EST ICI */}
                     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                         <DialogTrigger asChild>
@@ -166,6 +204,9 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
                                     onChange={(e) => setEmailBody(e.target.value)}
                                     className="min-h-[200px] text-sm dark:bg-[#001A3D] border-slate-200 dark:border-white/20 rounded-xl"
                                 />
+                                <p className="text-[10px] italic text-slate-400">
+                                    {"{{numero}}"} sera remplacé par le numéro de facture.
+                                </p>
                             </div>
 
                             <DialogFooter className="flex gap-2">
@@ -195,7 +236,7 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
                     <div className="p-6 bg-white dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10 grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <Label className="text-[10px] font-bold text-slate-400">N° Facture</Label>
-                            <Input value={factureInfos.numero} onChange={(e) => setFactureInfos({ ...factureInfos, numero: e.target.value })} className="dark:bg-[#001A3D]" />
+                            <Input value={numero || "Attribué à l'envoi"} disabled className="dark:bg-[#001A3D]" />
                         </div>
                         <div className="space-y-1">
                             <Label className="text-[10px] font-bold text-slate-400">Date</Label>
@@ -223,7 +264,7 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
                         <Input value={factureInfos.iban} onChange={(e) => setFactureInfos({ ...factureInfos, iban: e.target.value })} className="dark:bg-[#001A3D] text-xs" />
                     </div>
 
-                    <Button onClick={() => window.print()} className="w-full bg-slate-800 hover:bg-slate-900 h-14 rounded-2xl font-black uppercase text-white shadow-xl transition-all active:scale-95">
+                    <Button onClick={handlePrint} className="w-full bg-slate-800 hover:bg-slate-900 h-14 rounded-2xl font-black uppercase text-white shadow-xl transition-all active:scale-95">
                         <Printer className="mr-2" /> Imprimer le PDF localement
                     </Button>
                 </div>
@@ -234,7 +275,7 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
                         <img src="/log_asstsf.png" alt="Logo" className="w-16 h-16 object-contain" />
                         <div className="text-right">
                             <h3 className="text-2xl font-black italic text-blue-600 uppercase">Facture</h3>
-                            <p className="text-xs font-bold uppercase tracking-widest">{factureInfos.numero}</p>
+                            <p className="text-xs font-bold uppercase tracking-widest">{numero || "N° à l'envoi"}</p>
                             <p className="text-[9px] text-slate-400">Émise le {new Date(factureInfos.date).toLocaleDateString()}</p>
                         </div>
                     </div>
@@ -309,7 +350,7 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
                     <img src="/log_asstsf.png" alt="Logo" className="w-20 h-20 object-contain" />
                     <div className="text-right">
                         <h1 className="text-4xl font-black uppercase italic leading-none">Facture</h1>
-                        <p className="text-sm font-bold mt-2">N° {factureInfos.numero}</p>
+                        <p className="text-sm font-bold mt-2">N° {numero}</p>
                     </div>
                 </div>
 

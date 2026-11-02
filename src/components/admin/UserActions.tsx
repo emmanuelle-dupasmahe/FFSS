@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { deleteUser, toggleUserRole } from "@/app/actions/admin";
 import { useTransition } from "react";
+import { toast } from "sonner";
 
 export function UserActions({
   userId,
@@ -23,7 +24,8 @@ export function UserActions({
   const handleDelete = () => {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce membre ?")) {
       startTransition(async () => {
-        await deleteUser(userId);
+        const result = await deleteUser(userId);
+        if (result.error) toast.error(result.error);
       });
     }
   };
