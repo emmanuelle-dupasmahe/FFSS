@@ -223,6 +223,11 @@ model Inscription {
   devisSignedAt        DateTime?
   devisSignatureImg    String?   @db.Text
 
+  // Facture de la formation (numéro définitif + PDF archivé)
+  factureNumero        String?   @unique
+  factureDate          DateTime?
+  factureUrl           String?   @db.Text
+
   // Suivi financier manuel
   prixTotal           Float    @default(0)     // Le prix total à payer pour cette inscription
   paiements           Paiement[]    // Liste des versements effectués
@@ -231,6 +236,12 @@ model Inscription {
   inscriptionParentId String?
   inscriptionParent   Inscription?  @relation("ForfaitBundle", fields: [inscriptionParentId], references: [id], onDelete: Cascade)
   formationsIncluses  Inscription[] @relation("ForfaitBundle")
+}
+
+// Compteur annuel : garantit une numérotation continue des factures de formation
+model FactureCompteur {
+  annee   Int @id
+  dernier Int @default(0)
 }
 
 model Paiement {

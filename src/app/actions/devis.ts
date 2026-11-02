@@ -59,6 +59,99 @@ export async function processAndSendFormationDevis(
 }
 
 // ============================================================================
+// 1 bis. FORMATIONS : FACTURE
+// ============================================================================
+
+// Attribue le numéro définitif de la facture (une seule fois par inscription)
+export async function reserveFormationFactureNumero(inscriptionId: string) {
+    await requireAdmin();
+    try {
+        const inscription = await prisma.inscription.findUnique({ where: { id: inscriptionId } });
+        if (!inscription) return { success: false, error: "Dossier d'inscription introuvable." };
+        if (inscription.factureNumero) return { success: true, numero: inscription.factureNumero };
+
+        const annee = new Date().getFullYear();
+        const numero = await prisma.$transaction(async (tx) => {
+            const compteur = await tx.factureCompteur.upsert({
+                where: { annee },
+                update: { dernier: { increment: 1 } },
+                create: { annee, dernier: 1 },
+            });
+            const nouveauNumero = `F-FORM-${annee}-${String(compteur.dernier).padStart(4, "0")}`;
+            await tx.inscription.update({
+                where: { id: inscriptionId },
+                data: { factureNumero: nouveauNumero },
+            });
+            return nouveauNumero;
+        });
+
+        revalidatePath(`/admin/inscriptions/${inscriptionId}`);
+        return { success: true, numero };
+    } catch (error: any) {
+        console.error("Erreur numérotation facture formation :", error);
+        return { success: false, error: "Impossible d'attribuer un numéro de facture." };
+    }
+}
+
+export async function processAndSendFormationFacture({
+    inscriptionId,
+    dateFacture,
+    total,
+    customMessage,
+    pdfBase64
+}: {
+    inscriptionId: string;
+    dateFacture: string;
+    total: number;
+    customMessage: string;
+    pdfBase64: string;
+}) {
+    await requireAdmin();
+    try {
+        const inscription = await prisma.inscription.findUnique({
+            where: { id: inscriptionId },
+            include: { user: true, formation: true },
+        });
+
+        if (!inscription) return { success: false, error: "Dossier d'inscription introuvable." };
+        if (!inscription.factureNumero) return { success: false, error: "Numéro de facture manquant." };
+
+        const base64Data = pdfBase64.split("base64,")[1];
+        const pdfBuffer = Buffer.from(base64Data, "base64");
+
+        const result = await sendMail({
+            to: inscription.user.email,
+            subject: `Votre facture ASSTSF n° ${inscription.factureNumero} - Formation ${inscription.formation.title}`,
+            html: `
+                <div style="font-family: sans-serif; color: #333; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                  <p>${customMessage.replace(/\n/g, '<br>')}</p>
+                </div>
+            `,
+            attachments: [{ filename: `Facture_${inscription.factureNumero}.pdf`, content: pdfBuffer, contentType: "application/pdf" }],
+        });
+
+        if (!result.success) return { success: false, error: "L'e-mail n'a pas pu être envoyé." };
+
+        // On archive le PDF uniquement si l'e-mail est bien parti
+        await prisma.inscription.update({
+            where: { id: inscriptionId },
+            data: {
+                factureDate: new Date(dateFacture),
+                factureUrl: pdfBase64,
+                prixTotal: total,
+            },
+        });
+        revalidatePath(`/admin/inscriptions/${inscriptionId}`);
+        revalidatePath("/admin/inscriptions");
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("Erreur lors de l'envoi de la facture formation :", error);
+        return { success: false, error: error.message || "Une erreur est survenue lors de l'envoi." };
+    }
+}
+
+// ============================================================================
 // 2. DPS (Étape 1) : ENVOI DU RIS (FICHE DE DIMENSIONNEMENT)
 // ============================================================================
 

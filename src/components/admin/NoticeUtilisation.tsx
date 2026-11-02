@@ -16,7 +16,8 @@ import {
     Users,
     Settings,
     Send,
-    ArrowRightLeft
+    ArrowRightLeft,
+    FileCheck
 } from "lucide-react";
 
 export default function NoticeUtilisation() {
@@ -168,6 +169,22 @@ export default function NoticeUtilisation() {
                         <li>Cliquez sur <strong className="text-slate-900 dark:text-white">Enregistrer le changement</strong> et confirmez.</li>
                     </ol>
                     <p><span className="font-bold text-amber-500">Attention :</span> si un devis avait déjà été envoyé ou signé, il est <span className="font-bold">automatiquement annulé</span> car il concernait l'ancienne formation, et le dossier repasse en attente. Pensez alors à vérifier le prix dans la <strong className="text-slate-900 dark:text-white">Gestion financière</strong> (les paiements déjà enregistrés sont conservés), puis à générer et envoyer un nouveau devis, que le stagiaire signera à nouveau.</p>
+                </div>
+            )
+        },
+        {
+            id: 12,
+            title: "ENVOYER UNE FACTURE DE FORMATION",
+            icon: <FileCheck className="text-emerald-500" size={16} />,
+            content: (
+                <div className="space-y-2 text-slate-600 dark:text-slate-300">
+                    <p>La facture se prépare depuis le dossier du stagiaire :</p>
+                    <ol className="list-decimal ml-5 space-y-1 font-medium">
+                        <li>Dans l'onglet <strong className="text-slate-900 dark:text-white">Inscriptions</strong>, ouvrez le dossier puis cliquez sur <span className="font-bold text-emerald-500">Générer la Facture</span>.</li>
+                        <li>Vérifiez le destinataire, son adresse et les montants. Le prix et les paiements enregistrés sont repris automatiquement.</li>
+                        <li>Cliquez sur <strong className="text-slate-900 dark:text-white">Réviser & Envoyer par Mail</strong>, relisez le message puis confirmez.</li>
+                    </ol>
+                    <p><span className="font-bold text-amber-500">Attention :</span> le numéro de facture est <span className="font-bold">définitif</span> dès la première impression ou le premier envoi, et il se suit automatiquement. Le PDF envoyé reste téléchargeable depuis la page de la facture, et un dossier ayant un numéro de facture ne peut plus être supprimé.</p>
                 </div>
             )
         }

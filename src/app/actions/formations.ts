@@ -206,6 +206,12 @@ export async function deleteInscription(id: string) {
     }
 
     try {
+        // Une facture émise doit rester conservée avec son dossier
+        const inscription = await prisma.inscription.findUnique({ where: { id } });
+        if (inscription?.factureNumero) {
+            return { error: "Ce dossier a un numéro de facture : il ne peut pas être supprimé." };
+        }
+
         await prisma.inscription.delete({
             where: { id },
         });

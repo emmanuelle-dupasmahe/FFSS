@@ -165,6 +165,11 @@ export default async function InscriptionDetailPage({
                         <Button asChild className="w-full h-14 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all">
                             <Link href={`/admin/inscriptions/${ins.id}/devis`}>Générer le Devis</Link>
                         </Button>
+                        <Button asChild className="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all">
+                            <Link href={`/admin/inscriptions/${ins.id}/facture`}>
+                                {ins.factureDate ? "Voir la Facture" : "Générer la Facture"}
+                            </Link>
+                        </Button>
                         <form action={async () => {
                             "use server";
                             await updateInscriptionStatus(ins.id, "REFUSE");

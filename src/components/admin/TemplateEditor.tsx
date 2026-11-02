@@ -13,7 +13,8 @@ const TEMPLATE_TYPES = [
     { id: "RIS", title: "Fiche d'Analyse RIS & CONVENTION", vars: "{{eventTitle}}" },
     { id: "CHIFFRAGE", title: "Devis Estimatif", vars: "{{eventTitle}}" },
     { id: "FACTURE", title: "Facture Définitive", vars: "{{eventTitle}}, {{numero}}" },
-    { id: "FORMATION", title: "Devis Formation", vars: "{{formationName}}, {{clientName}}" }
+    { id: "FORMATION", title: "Devis Formation", vars: "{{formationName}}, {{clientName}}" },
+    { id: "FACTURE_FORMATION", title: "Facture Formation", vars: "{{formationName}}, {{clientName}}, {{numero}}" }
 ];
 
 export default function TemplateEditor({ initialTemplates }: { initialTemplates: any[] }) {
