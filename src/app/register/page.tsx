@@ -8,6 +8,7 @@ import { registerUser } from "@/app/actions/register";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -116,7 +117,7 @@ export default function RegisterPage() {
 
             <div className="grid gap-2">
               <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-slate-500">Mot de passe</Label>
-              <Input id="password" name="password" type="password" required className="h-12 rounded-xl border-slate-200 dark:border-white/10" />
+              <PasswordInput id="password" name="password" required className="h-12 rounded-xl border-slate-200 dark:border-white/10" />
             </div>
 
             <Button
