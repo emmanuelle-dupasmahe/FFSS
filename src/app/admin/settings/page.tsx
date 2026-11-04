@@ -8,6 +8,7 @@ export default async function SettingsPage() {
 
     // 🪛 On extrait spécifiquement la valeur de l'IBAN depuis les résultats
     const ibanRecord = contents.find(item => item.key === "IBAN_ASSO");
+    const bicRecord = contents.find(item => item.key === "BIC_ASSO");
 
     return (
         <div className="space-y-8 pb-10">
@@ -16,7 +17,7 @@ export default async function SettingsPage() {
             </h1>
 
             {/* 🪛 NOUVEAU : On affiche notre bloc bancaire */}
-            <IbanSettingsForm ibanActuel={ibanRecord?.value || ""} />
+            <IbanSettingsForm ibanActuel={ibanRecord?.value || ""} bicActuel={bicRecord?.value || ""} />
 
             {/* Ton éditeur classique reste intact en dessous */}
             <SettingsEditor initialData={contents} />

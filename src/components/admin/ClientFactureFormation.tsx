@@ -22,7 +22,7 @@ import {
 import { processAndSendFormationFacture, reserveFormationFactureNumero } from "@/app/actions/devis";
 import { toast } from "sonner";
 
-export default function ClientFactureFormation({ inscription, templateBody, ibanAsso, adresseAsso }: any) {
+export default function ClientFactureFormation({ inscription, templateBody, ibanAsso, bicAsso, adresseAsso }: any) {
     const isStructure = inscription.typeDemande === "STRUCTURE";
     const user = inscription.user;
     const dejaEnvoyee = !!inscription.factureUrl;
@@ -45,6 +45,7 @@ export default function ClientFactureFormation({ inscription, templateBody, iban
             ? [inscription.location, inscription.siret ? `SIRET : ${inscription.siret}` : ""].filter(Boolean).join("\n")
             : adresseUser,
         iban: ibanAsso || "FR76 3000 3020 8000 0372 7030 983",
+        bic: bicAsso || "SOGEFRPP",
         note: "Exonération de TVA - Article 261-7-1 du CGI"
     });
 
@@ -283,6 +284,7 @@ export default function ClientFactureFormation({ inscription, templateBody, iban
                     <div className="p-6 bg-white dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10 space-y-2">
                         <Label className="text-[10px] font-bold text-slate-400 uppercase">Coordonnées Bancaires (RIB)</Label>
                         <Input value={infos.iban} onChange={(e) => setInfos({ ...infos, iban: e.target.value })} className="dark:bg-[#001A3D] text-xs" />
+                        <Input value={infos.bic} onChange={(e) => setInfos({ ...infos, bic: e.target.value })} placeholder="BIC" className="dark:bg-[#001A3D] text-xs" />
                     </div>
 
                     <Button onClick={handlePrint} className="w-full bg-slate-800 hover:bg-slate-900 h-14 rounded-2xl font-black uppercase text-white shadow-xl transition-all active:scale-95">
@@ -339,7 +341,7 @@ export default function ClientFactureFormation({ inscription, templateBody, iban
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 block pt-2">Reste à payer</span>
                         <div className="text-4xl font-black italic tracking-tighter">{Math.max(resteAPayer, 0).toFixed(2)} €</div>
                         <p className="text-[8px] text-slate-400 pt-4 uppercase font-bold text-left">
-                            Règlement par virement ou chèque à l'ordre de l'ASSTSF - IBAN : {infos.iban}
+                            Règlement par virement ou chèque à l'ordre de l'ASSTSF - IBAN : {infos.iban} - BIC : {infos.bic}
                         </p>
                         <p className="text-[8px] text-slate-400 uppercase font-bold text-left">{infos.note}</p>
                     </div>
@@ -394,6 +396,7 @@ export default function ClientFactureFormation({ inscription, templateBody, iban
                     <div className="text-[9px] font-bold text-gray-500 uppercase leading-relaxed">
                         <p>Règlement par virement ou chèque à l'ordre de l'ASSTSF</p>
                         <p>IBAN : {infos.iban}</p>
+                        <p>BIC : {infos.bic}</p>
                         <p className="mt-2">{infos.note}</p>
                     </div>
                     <div className="text-right">

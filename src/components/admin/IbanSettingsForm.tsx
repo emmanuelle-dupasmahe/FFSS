@@ -8,18 +8,19 @@ import { toast } from "sonner";
 import { Landmark, Save, Loader2 } from "lucide-react";
 import { updateSiteSettings } from "@/app/actions/settings";
 
-export default function IbanSettingsForm({ ibanActuel }: { ibanActuel?: string }) {
+export default function IbanSettingsForm({ ibanActuel, bicActuel }: { ibanActuel?: string, bicActuel?: string }) {
     const [iban, setIban] = useState(ibanActuel || "");
+    const [bic, setBic] = useState(bicActuel || "");
     const [isSaving, setIsSaving] = useState(false);
 
     const handleSave = async () => {
         setIsSaving(true);
-        const result = await updateSiteSettings({ "IBAN_ASSO": iban });
+        const result = await updateSiteSettings({ "IBAN_ASSO": iban, "BIC_ASSO": bic });
 
         if (result.success) {
-            toast.success("L'IBAN a été mis à jour avec succès !");
+            toast.success("Les coordonnées bancaires ont été mises à jour !");
         } else {
-            toast.error("Erreur lors de l'enregistrement de l'IBAN.");
+            toast.error("Erreur lors de l'enregistrement des coordonnées bancaires.");
         }
         setIsSaving(false);
     };
@@ -41,13 +42,23 @@ export default function IbanSettingsForm({ ibanActuel }: { ibanActuel?: string }
                 />
             </div>
 
+            <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400">BIC de la banque (Affiché sur les factures)</Label>
+                <Input
+                    value={bic}
+                    onChange={(e) => setBic(e.target.value)}
+                    placeholder="SOGEFRPP"
+                    className="font-mono dark:bg-[#001A3D]"
+                />
+            </div>
+
             <Button
                 onClick={handleSave}
                 disabled={isSaving}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl uppercase font-black text-[10px] h-12"
             >
                 {isSaving ? <Loader2 className="animate-spin mr-2" size={16} /> : <Save className="mr-2" size={16} />}
-                Enregistrer le nouvel IBAN
+                Enregistrer les coordonnées bancaires
             </Button>
         </div>
     );

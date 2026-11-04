@@ -23,7 +23,7 @@ import { processAndSendDpsFacture, reserveDpsFactureNumero } from "@/app/actions
 import { toast } from "sonner";
 
 // 🛠️ AJOUT DES DATES (eventDate, endDate) DANS LES PROPS
-export default function ClientFacture({ effectifInitial, eventTitle, eventDate, endDate, location, totalInitial, devisDpsId, devisId, id, userEmail, templateBody, organismeDemandeur, nomContact, telephoneContact,ibanAsso, factureNumero, factureDate, factureUrl }: any) {
+export default function ClientFacture({ effectifInitial, eventTitle, eventDate, endDate, location, totalInitial, devisDpsId, devisId, id, userEmail, templateBody, organismeDemandeur, nomContact, telephoneContact,ibanAsso, bicAsso, factureNumero, factureDate, factureUrl }: any) {
     const router = useRouter();
 
     // SÉCURITÉ : On cherche l'ID partout où il pourrait être caché
@@ -38,6 +38,7 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
         clientNom: organismeDemandeur || "Structure...",
         clientAdresse: nomContact ? `À l'attention de : ${nomContact}\nAdresse du client...` : "Adresse du client...",
         iban: ibanAsso || "FR76 3000 3020 8000 0372 7030 983",
+        bic: bicAsso || "SOGEFRPP",
         note: "Exonération de TVA - Article 261-7-1 du CGI"
     });
 
@@ -262,6 +263,7 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
                     <div className="p-6 bg-white dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10 space-y-2">
                         <Label className="text-[10px] font-bold text-slate-400 uppercase">Coordonnées Bancaires (RIB)</Label>
                         <Input value={factureInfos.iban} onChange={(e) => setFactureInfos({ ...factureInfos, iban: e.target.value })} className="dark:bg-[#001A3D] text-xs" />
+                        <Input value={factureInfos.bic} onChange={(e) => setFactureInfos({ ...factureInfos, bic: e.target.value })} placeholder="BIC" className="dark:bg-[#001A3D] text-xs" />
                     </div>
 
                     <Button onClick={handlePrint} className="w-full bg-slate-800 hover:bg-slate-900 h-14 rounded-2xl font-black uppercase text-white shadow-xl transition-all active:scale-95">
@@ -331,7 +333,8 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
                                 <Landmark size={20} />
                                 <div className="text-[8px] font-medium leading-tight uppercase">
                                     Règlement par virement ou chèque à l'ordre de l'ASSTSF<br />
-                                    IBAN : {factureInfos.iban}
+                                    IBAN : {factureInfos.iban}<br />
+                                    BIC : {factureInfos.bic}
                                 </div>
                             </div>
                             <div className="text-right">
@@ -401,6 +404,7 @@ export default function ClientFacture({ effectifInitial, eventTitle, eventDate, 
                     <div className="text-[9px] font-bold text-gray-400 uppercase leading-relaxed">
                         <p>Règlement par virement ou chèque à l'ordre de l'ASSTSF</p>
                         <p>IBAN : {factureInfos.iban}</p>
+                        <p>BIC : {factureInfos.bic}</p>
                         <p className="mt-2">{factureInfos.note}</p>
                     </div>
                     <div className="text-right">

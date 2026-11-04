@@ -22,7 +22,7 @@ export default async function FactureFormationPage({ params }: { params: Promise
     });
 
     const contents = await prisma.siteContent.findMany({
-        where: { key: { in: ["IBAN_ASSO", "footer_address"] } }
+        where: { key: { in: ["IBAN_ASSO", "BIC_ASSO", "footer_address"] } }
     });
     const getVal = (k: string) => contents.find(c => c.key === k)?.value;
 
@@ -31,6 +31,7 @@ export default async function FactureFormationPage({ params }: { params: Promise
             inscription={inscription}
             templateBody={templateFacture?.body}
             ibanAsso={getVal("IBAN_ASSO")}
+            bicAsso={getVal("BIC_ASSO")}
             adresseAsso={getVal("footer_address")}
         />
     );
