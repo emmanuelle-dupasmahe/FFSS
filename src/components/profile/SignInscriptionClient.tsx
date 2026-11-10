@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { updateProfileFFSS, signFormationDevis } from "@/app/actions/inscriptions";
-import { User, MapPin, Calendar, PenTool, FileText, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { User, MapPin, Calendar, PenTool, FileText, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
 import Link from "next/link";
 
 export default function SignInscriptionClient({ inscription }: { inscription: any }) {
@@ -239,8 +239,27 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
                 </div>
             )}
 
+            {/* ÉTAPE 2 (devis pas encore envoyé) : ATTENTE DU DEVIS */}
+            {step === 2 && !inscription.devisUrl && (
+                <div className="bg-card border border-border rounded-[2rem] p-8 md:p-12 text-center space-y-5 shadow-sm animate-in fade-in duration-200">
+                    <div className="mx-auto w-20 h-20 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center">
+                        <Clock size={36} strokeWidth={2.5} />
+                    </div>
+                    <h3 className="text-xl font-black uppercase tracking-widest text-foreground">Devis en cours de préparation</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-lg mx-auto">
+                        Votre demande est bien enregistrée. Notre équipe prépare actuellement votre devis.
+                    </p>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-lg mx-auto">
+                        Vous recevrez un e-mail dès qu'il sera disponible : il vous suffira alors de revenir sur cette page pour le relire et le signer.
+                    </p>
+                    <Button asChild variant="outline" className="h-12 px-8 rounded-xl text-[10px] font-black uppercase tracking-widest border-border">
+                        <Link href="/profile">Retour à mon espace</Link>
+                    </Button>
+                </div>
+            )}
+
             {/* ÉTAPE 2 : PAD DE SIGNATURE */}
-            {step === 2 && (
+            {step === 2 && inscription.devisUrl && (
                 <div className="bg-card border border-border rounded-[2rem] p-6 md:p-8 space-y-6 shadow-sm animate-in fade-in duration-200">
                     <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/50 p-4 rounded-2xl flex gap-3 text-emerald-800 dark:text-emerald-400">
                         <CheckCircle2 className="shrink-0" size={20} />
@@ -255,19 +274,13 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
                             <FileText size={12} className="text-primary" /> Visualisation de votre devis de formation
                         </Label>
 
-                        {inscription.devisUrl ? (
-                            <div className="border border-border rounded-2xl overflow-hidden h-[450px] bg-slate-100 dark:bg-black/20 shadow-inner">
-                                <iframe
-                                    src={`${inscription.devisUrl}#toolbar=0`}
-                                    className="w-full h-full"
-                                    title="Prévisualisation du devis de formation"
-                                />
-                            </div>
-                        ) : (
-                            <div className="p-8 bg-slate-50 dark:bg-black/10 rounded-2xl border border-dashed border-border text-center text-xs text-slate-400 italic">
-                                Aucun document de devis n'est associé à ce dossier. Contactez l'administration.
-                            </div>
-                        )}
+                        <div className="border border-border rounded-2xl overflow-hidden h-[450px] bg-slate-100 dark:bg-black/20 shadow-inner">
+                            <iframe
+                                src={`${inscription.devisUrl}#toolbar=0`}
+                                className="w-full h-full"
+                                title="Prévisualisation du devis de formation"
+                            />
+                        </div>
                     </div>
 
                     {/* Zone tactile de dessin */}
@@ -301,7 +314,7 @@ export default function SignInscriptionClient({ inscription }: { inscription: an
                         <Button variant="outline" onClick={() => setStep(1)} className="h-12 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest border-border">
                             Précédent
                         </Button>
-                        <Button onClick={handleSignDevis} disabled={isSigning || !inscription.devisUrl} className="flex-1 h-12 rounded-xl uppercase font-black text-[10px] tracking-widest bg-emerald-600 hover:bg-emerald-700 text-white shadow-md disabled:opacity-50">
+                        <Button onClick={handleSignDevis} disabled={isSigning}className="flex-1 h-12 rounded-xl uppercase font-black text-[10px] tracking-widest bg-emerald-600 hover:bg-emerald-700 text-white shadow-md disabled:opacity-50">
                             {isSigning ? "Validation en cours..." : "Confirmer et signer le dossier"}
                         </Button>
                     </div>
